@@ -1,0 +1,28 @@
+services:
+  rsc-web:
+    container_name: rsc-web
+    build:
+      context: .   # root of the RSC project
+      dockerfile: src/RoadSignCapture.Web/Dockerfile
+    ports:
+      - "5050:5050"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5050
+      - ConnectionStrings__DefaultConnection=Server=rsc-db;Database=RSCDB;User Id=sa;Password=YourStrong!Passw0rd;
+    depends_on:
+      - rsc-db
+
+  rsc-db:
+    container_name: rsc-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+
+volumes:
+  sqlserverdata:
