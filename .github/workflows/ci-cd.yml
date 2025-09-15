@@ -94,5 +94,5 @@ jobs:
              export AZ_INSTANCE="${{ secrets.AZ_INSTANCE }}"
              export MG_BASE_URL="${{ secrets.MG_BASE_URL }}"
              export SCOPES="${{ secrets.SCOPES }}"
-             sudo docker compose pull rsc-web
-             sudo docker compose up -d
+             docker compose pull rsc-web
+             docker compose up -d
