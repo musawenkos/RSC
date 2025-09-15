@@ -1,15 +1,20 @@
 services:
   rsc-web:
-    container_name: rsc-web
-    build:
-      context: .   # root of the RSC project
-      dockerfile: src/RoadSignCapture.Web/Dockerfile
+    image: ghcr.io/musawenkosi/rsc/rsc-web:latest
     ports:
       - "5050:5050"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5050
-      - ConnectionStrings__DefaultConnection=Server=rsc-db;Database=RSCDB;User Id=sa;Password=RoadSignCapture2024!;
+      - Authentication__ClientId=${AZ_CLIENTID}
+      - Authentication__ClientSecret=${AZ_CLIENT_SECRET}
+      - Authentication__Domain=${AZ_DOMAIN}
+      - Authentication__TenantId=${AZ_TENANTID}
+      - Authentication__CallbackPath=${AZ_CALLBACK_PATH}
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - Authentication__Instance=${AZ_INSTANCE}
+      - MicrosoftGraph__BaseUrl=${MG_BASE_URL}
+      - MicrosoftGraph__Scopes=${SCOPES}
     depends_on:
       - rsc-db
 
@@ -17,7 +22,7 @@ services:
     container_name: rsc-db
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: "RoadSignCapture2024!"
+      SA_PASSWORD: "${DB_SA_PASSWORD}"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"

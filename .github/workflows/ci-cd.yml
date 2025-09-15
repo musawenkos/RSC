@@ -81,5 +81,15 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ~/RSC
+            export DB_CONNECTION_STRING="${{ secrets.DB_CONNECTION_STRING }}"
+            export DB_SA_PASSWORD="${{ secrets.DB_SA_PASSWORD }}"
+            export AZ_CLIENTID="${{ secrets.AZ_CLIENTID }}"
+            export AZ_CLIENT_SECRET="${{ secrets.AZ_CLIENT_SECRET }}"
+            export AZ_DOMAIN="${{ secrets.AZ_DOMAIN }}"
+            export AZ_TENANTID="${{ secrets.AZ_TENANTID }}"
+            export AZ_CALLBACK_PATH="${{ secrets.AZ_CALLBACK_PATH }}"
+            export AZ_INSTANCE="${{ secrets.AZ_INSTANCE }}"
+            export MG_BASE_URL="${{ secrets.MG_BASE_URL }}"
+            export SCOPES="${{ secrets.SCOPES }}"
             docker compose pull rsc-web
             docker compose up -d
