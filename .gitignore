@@ -1,0 +1,82 @@
+# ---------------------------
+# .NET / Visual Studio
+# ---------------------------
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+.vs
+
+# Rider / JetBrains
+.idea/
+
+# ---------------------------
+# Build & Publish Artifacts
+# ---------------------------
+/out/
+/publish/
+/app/publish/
+/app/build/
+/app/bin/
+/app/obj/
+
+# ---------------------------
+# Logs & Temp
+# ---------------------------
+*.log
+*.tlog
+*.cache
+*.tmp
+*.temp
+
+# ---------------------------
+# Docker
+# ---------------------------
+/docker-compose.override.yml
+*.env
+*.pid
+*.seed
+
+# ---------------------------
+# Sensitive Config Files
+# ---------------------------
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# ---------------------------
+# SQL Server
+# ---------------------------
+*.mdf
+*.ldf
+*.ndf
+sqlserverdata/
+
+# ---------------------------
+# Flutter (future mobile client)
+# ---------------------------
+/flutter_build/
+/pubspec.lock
+/.dart_tool/
+/.packages
+/build/
+
+# ---------------------------
+# OS Specific
+# ---------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ---------------------------
+# GitHub / CI/CD
+# ---------------------------
+# Don’t ignore workflow definitions!
+# Keep `.github/workflows/*.yml`
+!.github/workflows/

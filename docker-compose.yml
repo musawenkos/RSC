@@ -9,7 +9,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5050
-      - ConnectionStrings__DefaultConnection=Server=rsc-db;Database=RSCDB;User Id=sa;Password=YourStrong!Passw0rd;
+      - ConnectionStrings__DefaultConnection=Server=rsc-db;Database=RSCDB;User Id=sa;Password=RoadSignCapture2024!;
     depends_on:
       - rsc-db
 
@@ -17,7 +17,7 @@ services:
     container_name: rsc-db
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
+      SA_PASSWORD: "RoadSignCapture2024!"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
