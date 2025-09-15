@@ -47,7 +47,7 @@ jobs:
 
       # Build Docker image
       - name: Build Docker image
-        run: docker compose -f docker-compose.yml build
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/rsc-web:latest -f src/RoadSignCapture.Web/Dockerfile src/RoadSignCapture.Web
 
       # Login to GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -59,10 +59,7 @@ jobs:
 
       # Push image
       - name: Push Docker image
-        run: |
-          IMAGE=ghcr.io/${{ github.repository_owner }}/rsc-web:latest
-          docker tag rsc-web $IMAGE
-          docker push $IMAGE
+        run: docker push ghcr.io/${{ github.repository_owner }}/rsc-web:latest
 
   # -------------------------
   # CD JOB: Deploy to Server
