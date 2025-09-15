@@ -94,5 +94,18 @@ jobs:
              export AZ_INSTANCE="${{ secrets.AZ_INSTANCE }}"
              export MG_BASE_URL="${{ secrets.MG_BASE_URL }}"
              export SCOPES="${{ secrets.SCOPES }}"
+             
+             # Try login with better error handling
+             if echo "${{ secrets.ORG_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin; then
+               echo "Docker login successful"
+             else
+               echo "Docker login failed, trying alternative approaches..."
+               # Try with lowercase username
+               echo "${{ secrets.ORG_PAT }}" | docker login ghcr.io -u $(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]') --password-stdin
+             fi
+            
+             # Verify we can access the specific image
+             echo "Testing image access..."
+             docker manifest inspect ghcr.io/${{ github.repository_owner }}/rsc-web:latest || echo "Cannot inspect manifest - image may not exist or be accessible"
              docker compose pull rsc-web
              docker compose up -d
