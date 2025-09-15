@@ -83,7 +83,7 @@ jobs:
           script: |
              cd ~/RSC
              git reset --hard
-             git pull origin master
+             git pull https://${{ secrets.ORG_PAT }}@github.com/${{ github.repository }} master
              export DB_CONNECTION_STRING="${{ secrets.DB_CONNECTION_STRING }}"
              export DB_SA_PASSWORD="${{ secrets.DB_SA_PASSWORD }}"
              export AZ_CLIENTID="${{ secrets.AZ_CLIENTID }}"
@@ -94,5 +94,5 @@ jobs:
              export AZ_INSTANCE="${{ secrets.AZ_INSTANCE }}"
              export MG_BASE_URL="${{ secrets.MG_BASE_URL }}"
              export SCOPES="${{ secrets.SCOPES }}"
-             docker compose pull rsc-web
-             docker compose up -d
+             sudo docker compose pull rsc-web
+             sudo docker compose up -d
