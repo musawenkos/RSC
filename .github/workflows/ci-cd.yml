@@ -47,7 +47,7 @@ jobs:
 
       # Build Docker image
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/rsc-web:latest -f src/RoadSignCapture.Web/Dockerfile src/RoadSignCapture.Web
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/rsc-web:latest -f src/RoadSignCapture.Web/Dockerfile .
 
       # Login to GitHub Container Registry
       - name: Log in to GitHub Container Registry
