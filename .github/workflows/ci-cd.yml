@@ -80,6 +80,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /path/to/RSC
+            cd ~/RSC
             docker compose pull rsc-web
             docker compose up -d
