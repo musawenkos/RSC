@@ -1,6 +1,6 @@
 services:
   rsc-web:
-    image: ghcr.io/musawenkosi/rsc/rsc-web:latest
+    image: ghcr.io/musawenkos/rsc/rsc-web:latest
     ports:
       - "5050:5050"
     environment:
