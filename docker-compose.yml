@@ -3,9 +3,10 @@ services:
     image: ghcr.io/musawenkos/rsc-web:latest
     ports:
       - "5050:5050"
+      - "5051:5051"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5050
+      - ASPNETCORE_URLS=https://+:5051;http://+:5050
       - AzureAd__ClientId=${AZ_CLIENTID}
       - AzureAd__ClientSecret=${AZ_CLIENT_SECRET}
       - AzureAd__Domain=${AZ_DOMAIN}
