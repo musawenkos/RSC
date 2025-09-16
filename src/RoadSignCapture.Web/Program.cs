@@ -29,7 +29,10 @@ var app = builder.Build();
 // Add forwarded headers handling before auth so redirect URI uses original scheme/host
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    // Trust all proxies (useful in Docker networks)
+    KnownNetworks = { },
+    KnownProxies = { }
 });
 
 // Configure the HTTP request pipeline.
