@@ -6,13 +6,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5050
-      - Authentication__ClientId=${AZ_CLIENTID}
-      - Authentication__ClientSecret=${AZ_CLIENT_SECRET}
-      - Authentication__Domain=${AZ_DOMAIN}
-      - Authentication__TenantId=${AZ_TENANTID}
-      - Authentication__CallbackPath=${AZ_CALLBACK_PATH}
+      - AzureAd__ClientId=${AZ_CLIENTID}
+      - AzureAd__ClientSecret=${AZ_CLIENT_SECRET}
+      - AzureAd__Domain=${AZ_DOMAIN}
+      - AzureAd__TenantId=${AZ_TENANTID}
+      - AzureAd__CallbackPath=${AZ_CALLBACK_PATH}
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
-      - Authentication__Instance=${AZ_INSTANCE}
+      - AzureAd__Instance=${AZ_INSTANCE}
       - MicrosoftGraph__BaseUrl=${MG_BASE_URL}
       - MicrosoftGraph__Scopes=${SCOPES}
     depends_on:
