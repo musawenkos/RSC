@@ -7,6 +7,22 @@ using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.HttpOverrides;
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                              ForwardedHeaders.XForwardedProto |
+                              ForwardedHeaders.XForwardedHost;
+
+    // Trust all proxies - adjust this for your security requirements
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+
+    // Optional: specify the header names if they differ
+    options.ForwardedProtoHeaderName = "X-Forwarded-Proto";
+    options.ForwardedForHeaderName = "X-Forwarded-For";
+    options.ForwardedHostHeaderName = "X-Forwarded-Host";
+});
+
 var initialScopes = builder.Configuration["DownstreamApi:Scopes"]?.Split(' ') ?? builder.Configuration["MicrosoftGraph:Scopes"]?.Split(' ');
 
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
@@ -25,15 +41,6 @@ builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
 
 var app = builder.Build();
-
-// Add forwarded headers handling before auth so redirect URI uses original scheme/host
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-    // Trust all proxies (useful in Docker networks)
-    KnownNetworks = { },
-    KnownProxies = { }
-});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
