@@ -182,6 +182,13 @@ var app = builder.Build();
 // CRITICAL: UseForwardedHeaders MUST be first
 app.UseForwardedHeaders();
 
+// CRITICAL: Set the path base for apps hosted in subdirectories
+var pathBase = builder.Configuration["PathBase"];
+if (!string.IsNullOrEmpty(pathBase))
+{
+    app.UsePathBase(pathBase);
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
