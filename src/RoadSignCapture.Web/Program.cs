@@ -79,17 +79,18 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                     .GetRequiredService<ILogger<Program>>();
                 logger.LogError(ex, "Error in OnTokenValidated event");
             }
-            // This ensures the user has consented to the required scopes
-            options.Events.OnRedirectToIdentityProvider = context =>
-            {
-                // Only add consent prompt if we're requesting additional scopes
-                if (context.Properties.Items.ContainsKey("scopes"))
-                {
-                    context.ProtocolMessage.Prompt = "consent";
-                }
-                return Task.CompletedTask;
-            };
+            
 
+        };
+        // This ensures the user has consented to the required scopes
+        options.Events.OnRedirectToIdentityProvider = context =>
+        {
+            // Only add consent prompt if we're requesting additional scopes
+            if (context.Properties.Items.ContainsKey("scopes"))
+            {
+                context.ProtocolMessage.Prompt = "consent";
+            }
+            return Task.CompletedTask;
         };
 
     })
