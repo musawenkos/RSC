@@ -13,6 +13,7 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// IMPORTANT: Configure forwarded headers FIRST before any authentication
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
@@ -25,6 +26,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedProtoHeaderName = "X-Forwarded-Proto";
     options.ForwardedForHeaderName = "X-Forwarded-For";
     options.ForwardedHostHeaderName = "X-Forwarded-Host";
+
+    // CRITICAL: This tells ASP.NET Core to use the original host for redirects
+    options.ForwardLimit = null;
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -39,6 +43,9 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     {
         builder.Configuration.Bind("AzureAd", options);
 
+        // CRITICAL: Remove SignedOutCallbackPath to prevent loops
+        options.SignedOutCallbackPath = "/signout-callback-oidc";
+
         options.Scope.Clear();
         options.Scope.Add("openid");
         options.Scope.Add("profile");
@@ -47,62 +54,85 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         options.Scope.Add("Files.ReadWrite");
         options.SaveTokens = true;
 
-        // FIX: OnTokenValidated - for adding custom role claims
-        options.Events.OnTokenValidated = async context =>
+        // Disable HTTPS requirement if behind proxy handling SSL
+        options.RequireHttpsMetadata = false;
+
+        options.Events = new OpenIdConnectEvents
         {
-            try
+            OnTokenValidated = async context =>
             {
-                var userEmail = context.Principal?.FindFirst(ClaimTypes.Email)?.Value ??
-                               context.Principal?.FindFirst("preferred_username")?.Value ??
-                               context.Principal?.FindFirst("upn")?.Value;
-
-                if (!string.IsNullOrEmpty(userEmail))
+                try
                 {
-                    var userRoleService = context.HttpContext.RequestServices
-                        .GetRequiredService<IUserRole>();
+                    var userEmail = context.Principal?.FindFirst(ClaimTypes.Email)?.Value ??
+                                   context.Principal?.FindFirst("preferred_username")?.Value ??
+                                   context.Principal?.FindFirst("upn")?.Value;
 
-                    var roles = await userRoleService.GetUserRolesAsync(userEmail);
-
-                    var identity = (ClaimsIdentity)context.Principal!.Identity!;
-                    foreach (var role in roles)
+                    if (!string.IsNullOrEmpty(userEmail))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Role, role));
+                        var userRoleService = context.HttpContext.RequestServices
+                            .GetRequiredService<IUserRole>();
+
+                        var roles = await userRoleService.GetUserRolesAsync(userEmail);
+
+                        var identity = (ClaimsIdentity)context.Principal!.Identity!;
+                        foreach (var role in roles)
+                        {
+                            identity.AddClaim(new Claim(ClaimTypes.Role, role));
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
+                catch (Exception ex)
+                {
+                    var logger = context.HttpContext.RequestServices
+                        .GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Error in OnTokenValidated event");
+                }
+            },
+
+            OnRedirectToIdentityProvider = context =>
+            {
+                // CRITICAL: Ensure correct redirect URI is used
+                var request = context.HttpContext.Request;
+                var redirectUri = $"{request.Scheme}://{request.Host}{options.CallbackPath}";
+                context.ProtocolMessage.RedirectUri = redirectUri;
+
+                if (context.Properties.Items.ContainsKey("scopes"))
+                {
+                    context.ProtocolMessage.Prompt = "consent";
+                }
+                return Task.CompletedTask;
+            },
+
+            OnRemoteFailure = context =>
             {
                 var logger = context.HttpContext.RequestServices
                     .GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "Error in OnTokenValidated event");
-            }
-        };
+                logger.LogError(context.Failure, "Remote authentication failure");
 
-        // FIX: OnRedirectToIdentityProvider - moved OUTSIDE of OnTokenValidated
-        options.Events.OnRedirectToIdentityProvider = context =>
-        {
-            // Only add consent prompt if we're requesting additional scopes
-            if (context.Properties.Items.ContainsKey("scopes"))
+                context.Response.Redirect("/Error");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            },
+
+            OnAuthenticationFailed = context =>
             {
-                context.ProtocolMessage.Prompt = "consent";
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILogger<Program>>();
+                logger.LogError(context.Exception, "Authentication failed");
+
+                context.Response.Redirect("/Error");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            },
+
+            OnMessageReceived = context =>
+            {
+                // Log for debugging
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILogger<Program>>();
+                logger.LogInformation("Message received. Request path: {Path}", context.Request.Path);
+                return Task.CompletedTask;
             }
-            return Task.CompletedTask;
-        };
-
-        // ADDITIONAL FIX: Handle authentication failures to prevent loops
-        options.Events.OnRemoteFailure = context =>
-        {
-            context.Response.Redirect("/");
-            context.HandleResponse();
-            return Task.CompletedTask;
-        };
-
-        // ADDITIONAL FIX: Ensure proper redirect after sign-in
-        options.Events.OnSignedOutCallbackRedirect = context =>
-        {
-            context.Response.Redirect("/");
-            context.HandleResponse();
-            return Task.CompletedTask;
         };
     })
     .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
@@ -111,7 +141,9 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
-    options.FallbackPolicy = options.DefaultPolicy;
+    // CRITICAL: Don't use FallbackPolicy if it's causing issues
+    // Comment this out temporarily to test
+    // options.FallbackPolicy = options.DefaultPolicy;
 
     options.AddPolicy("RequireUser", policy =>
         policy.RequireAuthenticatedUser()
@@ -141,8 +173,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRole, UserRoleService>();
 
+// Add logging for debugging
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 var app = builder.Build();
 
+// CRITICAL: UseForwardedHeaders MUST be first
 app.UseForwardedHeaders();
 
 if (!app.Environment.IsDevelopment())
@@ -150,11 +187,29 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseStaticFiles();
 app.UseRouting();
+
+// CRITICAL: Authentication before Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Add middleware to log requests for debugging
+app.Use(async (context, next) =>
+{
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("Request: {Method} {Path} {Scheme} {Host}",
+        context.Request.Method,
+        context.Request.Path,
+        context.Request.Scheme,
+        context.Request.Host);
+    await next();
+});
 
 app.MapRazorPages();
 app.MapControllers();
