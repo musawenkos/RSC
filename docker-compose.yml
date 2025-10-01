@@ -1,6 +1,9 @@
 services:
   rsc-web:
     image: ghcr.io/musawenkos/rsc-web:latest
+    build:
+      context: .
+      dockerfile: src/RoadSignCapture.Web/Dockerfile
     ports:
       - "5050:5050"
     environment:

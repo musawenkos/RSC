@@ -1,0 +1,45 @@
+﻿@page
+@model RoadSignCapture.Web.Pages.Users.IndexModel
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="container mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold mb-6">👥 Users</h1>
+
+    @if (Model.Users.Any())
+    {
+        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+            <table class="min-w-full text-sm text-left text-gray-600">
+                <thead class="bg-gray-100 text-gray-800 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-3">Display Name</th>
+                        <th class="px-6 py-3">Email</th>
+                        <th class="px-6 py-3">Company</th>
+                        <th class="px-6 py-3">Role</th>
+                        <th class="px-6 py-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-3 font-medium text-gray-900">@user.DisplayName</td>
+                            <td class="px-6 py-3">@user.Email</td>
+                            <td class="px-6 py-3">@user.Company.CompanyName</td>
+                            <td class="px-6 py-3">@string.Join(", ",user.Roles!.Select(ur => ur.RoleName).ToArray())</td>
+                            <td class="px-6 py-3 text-center">
+                                <a href="/Users/Edit/@user.Email" class="text-blue-600 hover:underline">Edit</a> |
+                                <a href="/Users/Delete/@user.Email" class="text-red-600 hover:underline">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-gray-500 italic">No users found.</p>
+    }
+</div>

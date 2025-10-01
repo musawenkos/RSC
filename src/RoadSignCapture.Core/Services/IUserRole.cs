@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RoadSignCapture.Core.Services
+{
+    public interface IUserRole
+    {
+        Task<string[]> GetUserRolesAsync(string userEmail);
+    }
+}
