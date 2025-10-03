@@ -42,7 +42,7 @@ builder.Services
         options.Scope = "openid profile email";
 
         // Callback paths
-        options.CallbackPath = $"{builder.Configuration["PathBase"]}/callback";
+        options.CallbackPath = "/RoadSignCapture/callback";
         //options.SignOutScheme = "/signout-callback";
 
         // Configure OpenIdConnect options
@@ -82,7 +82,7 @@ builder.Services
                 var request = context.HttpContext.Request;
                 var pathBase = context.HttpContext.Request.PathBase.Value ?? string.Empty;
 
-                var redirectUri = $"{request.Scheme}://{request.Host}{pathBase}/callback";
+                var redirectUri = $"{request.Scheme}://{request.Host}/RoadSignCapture/callback";
                 context.ProtocolMessage.RedirectUri = redirectUri;
 
                 return Task.CompletedTask;
@@ -150,12 +150,8 @@ var app = builder.Build();
 app.UseForwardedHeaders();
 
 // CRITICAL: Set the path base for apps hosted in subdirectories
-var pathBase = builder.Configuration["PathBase"];
-if (!string.IsNullOrEmpty(pathBase))
-{
-    app.UsePathBase(pathBase);
-}
 
+app.UsePathBase("/RoadSignCapture/");
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
