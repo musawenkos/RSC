@@ -1,11 +1,9 @@
+using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
 using RoadSignCapture.Core.Services;
 using RoadSignCapture.Infrastructure.Data;
 using RoadSignCapture.Infrastructure.Services;
@@ -27,7 +25,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedForHeaderName = "X-Forwarded-For";
     options.ForwardedHostHeaderName = "X-Forwarded-Host";
 
-    // CRITICAL: This tells ASP.NET Core to use the original host for redirects
     options.ForwardLimit = null;
 });
 
@@ -35,37 +32,28 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<RSCDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-var initialScopes = builder.Configuration["DownstreamApi:Scopes"]?.Split(' ') ??
-                   builder.Configuration["MicrosoftGraph:Scopes"]?.Split(' ');
-
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(options =>
+// Configure Auth0 Authentication
+builder.Services
+    .AddAuth0WebAppAuthentication(options =>
     {
-        builder.Configuration.Bind("AzureAd", options);
+        options.Domain = builder.Configuration["AzureAd:Domain"];
+        options.ClientId = builder.Configuration["AzureAd:ClientId"];
+        options.ClientSecret = builder.Configuration["AzureAd:ClientSecret"];
+        options.Scope = "openid profile email";
 
-        // CRITICAL: Remove SignedOutCallbackPath to prevent loops
-        options.SignedOutCallbackPath = "/signout-callback-oidc";
+        // Callback paths
+        options.CallbackPath = "/RoadSignCapture/callback";
+        //options.SignOutScheme = "/signout-callback";
 
-        options.Scope.Clear();
-        options.Scope.Add("openid");
-        options.Scope.Add("profile");
-        options.Scope.Add("email");
-        options.Scope.Add("User.Read");
-        options.Scope.Add("Files.ReadWrite");
-        options.SaveTokens = true;
-
-        // Disable HTTPS requirement if behind proxy handling SSL
-        options.RequireHttpsMetadata = false;
-
-        options.Events = new OpenIdConnectEvents
+        // Configure OpenIdConnect options
+        options.OpenIdConnectEvents = new Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents
         {
             OnTokenValidated = async context =>
             {
                 try
                 {
                     var userEmail = context.Principal?.FindFirst(ClaimTypes.Email)?.Value ??
-                                   context.Principal?.FindFirst("preferred_username")?.Value ??
-                                   context.Principal?.FindFirst("upn")?.Value;
+                                   context.Principal?.FindFirst("email")?.Value;
 
                     if (!string.IsNullOrEmpty(userEmail))
                     {
@@ -91,15 +79,10 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 
             OnRedirectToIdentityProvider = context =>
             {
-                // CRITICAL: Ensure correct redirect URI is used
                 var request = context.HttpContext.Request;
-                var redirectUri = $"{request.Scheme}://{request.Host}{options.CallbackPath}";
+                var redirectUri = $"{request.Scheme}://{request.Host}/RoadSignCapture/callback";
                 context.ProtocolMessage.RedirectUri = redirectUri;
 
-                if (context.Properties.Items.ContainsKey("scopes"))
-                {
-                    context.ProtocolMessage.Prompt = "consent";
-                }
                 return Task.CompletedTask;
             },
 
@@ -123,28 +106,12 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 context.Response.Redirect("/Error");
                 context.HandleResponse();
                 return Task.CompletedTask;
-            },
-
-            OnMessageReceived = context =>
-            {
-                // Log for debugging
-                var logger = context.HttpContext.RequestServices
-                    .GetRequiredService<ILogger<Program>>();
-                logger.LogInformation("Message received. Request path: {Path}", context.Request.Path);
-                return Task.CompletedTask;
             }
         };
-    })
-    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-    .AddMicrosoftGraph(builder.Configuration.GetSection("MicrosoftGraph"))
-    .AddInMemoryTokenCaches();
+    });
 
 builder.Services.AddAuthorization(options =>
 {
-    // CRITICAL: Don't use FallbackPolicy if it's causing issues
-    // Comment this out temporarily to test
-    // options.FallbackPolicy = options.DefaultPolicy;
-
     options.AddPolicy("RequireUser", policy =>
         policy.RequireAuthenticatedUser()
               .RequireRole("Viewer", "Client", "Designer", "SysAdmin"));
@@ -165,15 +132,13 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizePage("/Users", "RequireUser");
-})
-.AddMicrosoftIdentityUI();
+});
 
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRole, UserRoleService>();
 
-// Add logging for debugging
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
@@ -202,11 +167,9 @@ else
 app.UseStaticFiles();
 app.UseRouting();
 
-// CRITICAL: Authentication before Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Add middleware to log requests for debugging
 app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();

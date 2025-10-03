@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Graph;
 using RoadSignCapture.Core.Models;
 using RoadSignCapture.Core.Services;
 using System.Threading.Tasks;
