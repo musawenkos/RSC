@@ -42,7 +42,7 @@ builder.Services
         options.Scope = "openid profile email";
 
         // Callback paths
-        options.CallbackPath = "/RoadSignCapture/callback";
+        options.CallbackPath = "/callback";
         //options.SignOutScheme = "/signout-callback";
 
         // Configure OpenIdConnect options
@@ -80,7 +80,7 @@ builder.Services
             OnRedirectToIdentityProvider = context =>
             {
                 var request = context.HttpContext.Request;
-                var redirectUri = $"{request.Scheme}://{request.Host}/RoadSignCapture/callback";
+                var redirectUri = $"{request.Scheme}://{request.Host}/callback";
                 context.ProtocolMessage.RedirectUri = redirectUri;
 
                 return Task.CompletedTask;
