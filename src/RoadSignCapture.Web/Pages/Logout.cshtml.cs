@@ -11,7 +11,7 @@ namespace RoadSignCapture.Web.Pages
         public async Task OnGet()
         {
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
-                .WithRedirectUri("/RoadSignCapture/")
+                .WithRedirectUri("/")
                 .Build();
 
             await HttpContext.SignOutAsync(

@@ -7,7 +7,7 @@ namespace RoadSignCapture.Web.Pages
 {
     public class LoginModel : PageModel
     {
-        public async Task OnGet(string returnUrl = "/RoadSignCapture/")
+        public async Task OnGet(string returnUrl = "/")
         {
             var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
                 .WithRedirectUri(returnUrl)
