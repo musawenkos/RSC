@@ -42,7 +42,7 @@ builder.Services
         options.Scope = "openid profile email";
 
         // Callback paths
-        options.CallbackPath = "/callback";
+        options.CallbackPath = $"{builder.Configuration["PathBase"]}/callback";
         //options.SignOutScheme = "/signout-callback";
 
         // Configure OpenIdConnect options
@@ -80,7 +80,9 @@ builder.Services
             OnRedirectToIdentityProvider = context =>
             {
                 var request = context.HttpContext.Request;
-                var redirectUri = $"{request.Scheme}://{request.Host}/callback";
+                var pathBase = context.HttpContext.Request.PathBase.Value ?? string.Empty;
+
+                var redirectUri = $"{request.Scheme}://{request.Host}{pathBase}/callback";
                 context.ProtocolMessage.RedirectUri = redirectUri;
 
                 return Task.CompletedTask;
