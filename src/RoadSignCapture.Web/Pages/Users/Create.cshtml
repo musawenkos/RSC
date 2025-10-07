@@ -1,0 +1,86 @@
+﻿@page
+@model RoadSignCapture.Web.Pages.Users.CreateModel
+@{
+    ViewData["Title"] = "Create Command.Users";
+}
+
+<div class="container mx-auto px-4 py-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
+        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <i class="bi bi-person-plus-fill text-blue-600"></i> Create User
+        </h1>
+
+        <a asp-page="Index"
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200
+                  rounded-lg shadow-sm transition duration-200">
+            <i class="bi bi-arrow-left-short mr-2"></i> Back to List
+        </a>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6 border border-gray-100">
+        <form method="post" class="space-y-6">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm mb-3"></div>
+
+            <!-- Email -->
+            <div>
+                <label asp-for="Command.Users.Email" class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                <input asp-for="Command.Users.Email" type="email"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500
+                              focus:outline-none"
+                       placeholder="Enter user email" />
+                <span asp-validation-for="Command.Users.Email" class="text-red-600 text-xs"></span>
+            </div>
+
+            <!-- Display Name -->
+            <div>
+                <label asp-for="Command.Users.DisplayName" class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                <input asp-for="Command.Users.DisplayName"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500
+                              focus:outline-none"
+                       placeholder="Enter display name" />
+                <span asp-validation-for="Command.Users.DisplayName" class="text-red-600 text-xs"></span>
+            </div>
+
+            <!-- Company -->
+            <div>
+                <label asp-for="Command.Users.CompanyId" class="block text-sm font-semibold text-gray-700 mb-1">Company</label>
+                <select asp-for="Command.Users.CompanyId" asp-items="ViewBag.CompanyId"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2
+                               focus:ring-blue-500 focus:outline-none">
+                    <option value="">-- Select Company --</option>
+                </select>
+                <span asp-validation-for="Command.Users.CompanyId" class="text-red-600 text-xs"></span>
+            </div>
+
+            <!-- Role -->
+            <div>
+                <label asp-for="Command.SelectedRoleId" class="block text-sm font-semibold text-gray-700 mb-1">Role</label>
+                <select asp-for="Command.SelectedRoleId" asp-items="Model.RoleList"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2
+                               focus:ring-blue-500 focus:outline-none">
+                    <option value="">-- Select Role --</option>
+                </select>
+                <span asp-validation-for="Command.SelectedRoleId" class="text-red-600 text-xs"></span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end space-x-3 pt-4">
+                <a asp-page="Index"
+                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100
+                          hover:bg-gray-200 rounded-lg shadow-sm transition">
+                    Cancel
+                </a>
+
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600
+                               hover:bg-blue-700 rounded-lg shadow-md transition duration-200">
+                    <i class="bi bi-check-circle mr-2"></i> Create User
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

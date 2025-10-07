@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using RoadSignCapture.Core.Services;
+using RoadSignCapture.Core.Users.Commands;
 using RoadSignCapture.Infrastructure.Data;
 using RoadSignCapture.Infrastructure.Services;
 using System.Security.Claims;
@@ -141,6 +142,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRole, UserRoleService>();
 
+builder.Services.AddScoped<UserHandler>();
+
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
@@ -168,7 +171,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Use(async (context, next) =>
+/*app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
     logger.LogInformation("Request: {Method} {Path} {Scheme} {Host}",
@@ -177,7 +180,7 @@ app.Use(async (context, next) =>
         context.Request.Scheme,
         context.Request.Host);
     await next();
-});
+});*/
 
 app.MapRazorPages();
 app.MapControllers();

@@ -9,5 +9,7 @@ namespace RoadSignCapture.Core.Services
     public interface IUserRole
     {
         Task<string[]> GetUserRolesAsync(string userEmail);
+        Task<int?> GetUserRoleIdByEmailAsync(string userEmail);
+        Task<bool?> UpdateUserRoleByEmailAsync(string userEmail, int newRoleId);
     }
 }

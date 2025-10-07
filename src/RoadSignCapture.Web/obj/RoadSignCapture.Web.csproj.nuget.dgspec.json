@@ -229,6 +229,12 @@
               "target": "Package",
               "version": "[9.0.9, )"
             },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
             "Microsoft.Identity.Web": {
               "target": "Package",
               "version": "[3.8.2, )"
@@ -240,6 +246,10 @@
             "Microsoft.Identity.Web.UI": {
               "target": "Package",
               "version": "[3.8.1, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[9.0.0, )"
             }
           },
           "imports": [

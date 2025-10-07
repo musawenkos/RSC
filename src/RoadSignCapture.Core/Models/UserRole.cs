@@ -10,11 +10,11 @@ namespace RoadSignCapture.Core.Models
     public class UserRole
     {
         [ForeignKey("User")]
-        public string UserEmail { get; set; }
-        public User User { get; set; }
+        public string? UserEmail { get; set; }
+        public User? User { get; set; }
 
         [ForeignKey("Role")]
         public int RoleId { get; set; }
-        public Role Role { get; set; }
+        public Role? Role { get; set; }
     }
 }

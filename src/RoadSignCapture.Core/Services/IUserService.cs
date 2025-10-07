@@ -9,6 +9,11 @@ namespace RoadSignCapture.Core.Services
 {
     public interface IUserService
     {
-        Task<IList<User>> GetAllUsersAsync();
+        Task<IList<User>> GetAllUsersAsync(string authUserEmail);
+        Task AddAsync(User user);
+        Task SaveChangesAsync();
+        Task<User?> GetUserBy(string id);
+        bool UserExists(string email);
+        void Remove(User user);
     }
 }

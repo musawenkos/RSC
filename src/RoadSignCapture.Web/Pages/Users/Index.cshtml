@@ -5,11 +5,20 @@
 }
 
 <div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6">👥 Users</h1>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
+        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            👥 Users
+        </h1>
+        <a asp-page="Create"
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700
+                  rounded-lg shadow transition duration-200">
+            <i class="bi bi-person-plus-fill mr-2"></i> Create New
+        </a>
+    </div>
 
     @if (Model.Users.Any())
     {
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+        <div class="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-100">
             <table class="min-w-full text-sm text-left text-gray-600">
                 <thead class="bg-gray-100 text-gray-800 uppercase text-xs">
                     <tr>
@@ -23,14 +32,30 @@
                 <tbody>
                     @foreach (var user in Model.Users)
                     {
-                        <tr class="border-b hover:bg-gray-50">
+                        <tr class="border-b hover:bg-gray-50 transition">
                             <td class="px-6 py-3 font-medium text-gray-900">@user.DisplayName</td>
                             <td class="px-6 py-3">@user.Email</td>
                             <td class="px-6 py-3">@user.Company.CompanyName</td>
-                            <td class="px-6 py-3">@string.Join(", ",user.Roles!.Select(ur => ur.RoleName).ToArray())</td>
-                            <td class="px-6 py-3 text-center">
-                                <a href="/Users/Edit/@user.Email" class="text-blue-600 hover:underline">Edit</a> |
-                                <a href="/Users/Delete/@user.Email" class="text-red-600 hover:underline">Delete</a>
+                            <td class="px-6 py-3">
+                                @if (user.Roles != null && user.Roles.Any())
+                                {
+                                    @string.Join(", ", user.Roles.Select(r => r.RoleName))
+                                }
+                                else
+                                {
+                                    <span class="text-gray-400 italic">No Role</span>
+                                }
+                            </td>
+                            <td class="px-6 py-3 text-center space-x-3">
+                                <a asp-page="./Edit" asp-route-id="@user.Email"
+                                   class="text-blue-600 hover:text-blue-800 font-medium transition">
+                                    Edit
+                                </a>
+                                <span class="text-gray-300">|</span>
+                                <a asp-page="./Delete" asp-route-id="@user.Email"
+                                   class="text-red-600 hover:text-red-800 font-medium transition">
+                                    Delete
+                                </a>
                             </td>
                         </tr>
                     }
@@ -40,6 +65,7 @@
     }
     else
     {
-        <p class="text-gray-500 italic">No users found.</p>
+        <p class="text-gray-500 italic text-center py-8">No users found.</p>
     }
 </div>
+

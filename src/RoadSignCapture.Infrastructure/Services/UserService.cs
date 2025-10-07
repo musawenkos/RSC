@@ -17,16 +17,23 @@ namespace RoadSignCapture.Infrastructure.Services
         {
             _context = contextRSC;
         }
-        public async Task<IList<User>> GetAllUsersAsync()
+        public async Task<IList<User>> GetAllUsersAsync(string authenticatedUser)
         {
-            //Exclude authenticated user
-
             return await _context.Users
                 .AsNoTracking()
+                .Where(u => u.Email != authenticatedUser)
                 .Include(c => c.Company)
                 .Include(r => r.Roles)
                 .OrderByDescending(u => u.Created)
                 .ToListAsync();
         }
+
+        public async Task<User?> GetUserBy(string userEmail) => await _context.Users.FindAsync(userEmail);
+        public bool UserExists(string email) => _context.Users.Any(e => e.Email == email);
+        public async Task AddAsync(User user) => await _context.Users.AddAsync(user);
+        public void Remove(User user) => _context.Users.Remove(user);
+        public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
+
+        
     }
 }

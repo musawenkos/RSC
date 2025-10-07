@@ -19,8 +19,8 @@ namespace RoadSignCapture.Web.Pages.Users
         public IList<Core.Models.User> Users { get; set; } = default!;
         public async Task OnGetAsync()
         {
-            
-            Users = await _userService!.GetAllUsersAsync();
+            var authenticatedUser = User.Identity?.Name!;
+            Users = await _userService!.GetAllUsersAsync(authenticatedUser);
         }
     }
 }
