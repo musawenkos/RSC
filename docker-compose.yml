@@ -21,6 +21,20 @@ services:
     depends_on:
       - rsc-db
 
+  rsc-api:
+    image: ghcr.io/musawenkosi/rsc-api:latest
+    build:
+      context: .
+      dockerfile: src/RoadSignCapture.API/Dockerfile
+    ports:
+      - "5040:5040"
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+    - ASPNETCORE_URLS=http://+:5040
+    depends_on:
+    - rsc-db
+
   rsc-db:
     container_name: rsc-db
     image: mcr.microsoft.com/mssql/server:2022-latest

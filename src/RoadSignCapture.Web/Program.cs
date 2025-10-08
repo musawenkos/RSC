@@ -132,6 +132,8 @@ builder.Services.AddAuthorization(options =>
               .RequireRole("Client", "SysAdmin"));
 });
 
+builder.Services.AddControllers();
+
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizePage("/Users", "RequireUser");

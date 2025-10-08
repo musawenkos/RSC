@@ -6,10 +6,15 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_WEB: rsc-web
+  IMAGE_NAME_API: rsc-api
+
 jobs:
-  # -------------------------
-  # CI JOB: Build & Test Code
-  # -------------------------
+  # ====================================================
+  # 🧩 CI JOB: Build, Test, and Push Docker Images
+  # ====================================================
   build-test-docker:
     runs-on: ubuntu-latest
 
@@ -17,17 +22,20 @@ jobs:
       mssql:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
-          SA_PASSWORD: "RoadSignCapture2024!"
+          SA_PASSWORD: "${DB_SA_PASSWORD}"
           ACCEPT_EULA: "Y"
         ports:
           - 1433:1433
         options: >-
-          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'RoadSignCapture2024!' -Q 'SELECT 1' || exit 1"
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P '${DB_SA_PASSWORD}' -Q 'SELECT 1' || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
 
     steps:
+      # ----------------------------
+      # ✅ Checkout and Setup
+      # ----------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -36,34 +44,69 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
+      # ----------------------------
+      # 🧠 Build & Test
+      # ----------------------------
       - name: Restore dependencies
         run: dotnet restore ./src/RoadSignCapture.Web/RoadSignCapture.Web.csproj
 
-      - name: Build
+      - name: Build solution
         run: dotnet build --no-restore --configuration Release ./src/RoadSignCapture.Web/RoadSignCapture.Web.csproj
 
       - name: Run tests
         run: dotnet test --no-build --verbosity normal ./src/RoadSignCapture.Tests/RoadSignCapture.Tests.csproj
 
-      # Build Docker image
-      - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/rsc-web:latest -f src/RoadSignCapture.Web/Dockerfile .
+      # ----------------------------
+      # 🏷️ Determine Version Tag
+      # ----------------------------
+      - name: Set image version tag
+        id: vars
+        run: |
+          VERSION=$(git describe --tags --always || echo "v0.0.0")
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "Image Version: ${VERSION}"
 
-      # Login to GitHub Container Registry
+      # ----------------------------
+      # 🐳 Build Docker Images (Web + API)
+      # ----------------------------
+      - name: Build Web Docker image
+        run: |
+          docker build -t $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_WEB:latest \
+                       -t $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_WEB:${{ env.VERSION }} \
+                       -f src/RoadSignCapture.Web/Dockerfile .
+
+      - name: Build API Docker image
+        run: |
+          docker build -t $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_API:latest \
+                       -t $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_API:${{ env.VERSION }} \
+                       -f src/RoadSignCapture.API/Dockerfile .
+
+      # ----------------------------
+      # 🔐 Login to GitHub Container Registry
+      # ----------------------------
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.ORG_PAT }}
 
-      # Push image
-      - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository_owner }}/rsc-web:latest
+      # ----------------------------
+      # 📤 Push Docker Images (Web + API)
+      # ----------------------------
+      - name: Push Web Docker image
+        run: |
+          docker push $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_WEB:latest
+          docker push $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_WEB:${{ env.VERSION }}
 
-  # -------------------------
-  # CD JOB: Deploy to Server
-  # -------------------------
+      - name: Push API Docker image
+        run: |
+          docker push $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_API:latest
+          docker push $REGISTRY/${{ github.repository_owner }}/$IMAGE_NAME_API:${{ env.VERSION }}
+
+  # ====================================================
+  # 🚀 CD JOB: Deploy to Production Server
+  # ====================================================
   deploy:
     needs: build-test-docker
     runs-on: ubuntu-latest
@@ -81,31 +124,28 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SERVER_SSH_KEY_PASSPHRASE }}
           script: |
-             cd ~/RSC
-             git reset --hard
-             git pull https://${{ secrets.ORG_PAT }}@github.com/${{ github.repository }} master
-             export DB_CONNECTION_STRING="${{ secrets.DB_CONNECTION_STRING }}"
-             export DB_SA_PASSWORD="${{ secrets.DB_SA_PASSWORD }}"
-             export AZ_CLIENTID="${{ secrets.AZ_CLIENTID }}"
-             export AZ_CLIENT_SECRET="${{ secrets.AZ_CLIENT_SECRET }}"
-             export AZ_DOMAIN="${{ secrets.AZ_DOMAIN }}"
-             export AZ_TENANTID="${{ secrets.AZ_TENANTID }}"
-             export AZ_CALLBACK_PATH="${{ secrets.AZ_CALLBACK_PATH }}"
-             export AZ_INSTANCE="${{ secrets.AZ_INSTANCE }}"
-             export MG_BASE_URL="${{ secrets.MG_BASE_URL }}"
-             export SCOPES="${{ secrets.SCOPES }}"
-             
-             # Try login with better error handling
-             if echo "${{ secrets.ORG_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin; then
-               echo "Docker login successful"
-             else
-               echo "Docker login failed, trying alternative approaches..."
-               # Try with lowercase username
-               echo "${{ secrets.ORG_PAT }}" | docker login ghcr.io -u $(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]') --password-stdin
-             fi
-            
-             # Verify we can access the specific image
-             echo "Testing image access..."
-             docker manifest inspect ghcr.io/${{ github.repository_owner }}/rsc-web:latest || echo "Cannot inspect manifest - image may not exist or be accessible"
-             docker compose pull rsc-web
-             docker compose up -d
+            cd ~/RSC
+            git reset --hard
+            git pull https://${{ secrets.ORG_PAT }}@github.com/${{ github.repository }} master
+
+            echo "🔧 Setting environment variables..."
+            export DB_CONNECTION_STRING="${{ secrets.DB_CONNECTION_STRING }}"
+            export DB_SA_PASSWORD="${{ secrets.DB_SA_PASSWORD }}"
+            export AZ_CLIENTID="${{ secrets.AZ_CLIENTID }}"
+            export AZ_CLIENT_SECRET="${{ secrets.AZ_CLIENT_SECRET }}"
+            export AZ_DOMAIN="${{ secrets.AZ_DOMAIN }}"
+            export AZ_TENANTID="${{ secrets.AZ_TENANTID }}"
+            export AZ_CALLBACK_PATH="${{ secrets.AZ_CALLBACK_PATH }}"
+            export AZ_INSTANCE="${{ secrets.AZ_INSTANCE }}"
+            export MG_BASE_URL="${{ secrets.MG_BASE_URL }}"
+            export SCOPES="${{ secrets.SCOPES }}"
+
+            echo "🔐 Logging in to GitHub Container Registry..."
+            echo "${{ secrets.ORG_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            echo "📦 Pulling latest Docker images..."
+            docker compose pull rsc-web
+            docker compose pull rsc-api
+
+            echo "🚀 Deploying containers..."
+            docker compose up -d

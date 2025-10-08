@@ -42,14 +42,57 @@
             </div>
 
             <!-- Company -->
-            <div>
-                <label asp-for="Command.Users.CompanyId" class="block text-sm font-semibold text-gray-700 mb-1">Company</label>
-                <select asp-for="Command.Users.CompanyId" asp-items="ViewBag.CompanyId"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2
-                               focus:ring-blue-500 focus:outline-none">
-                    <option value="">-- Select Company --</option>
-                </select>
-                <span asp-validation-for="Command.Users.CompanyId" class="text-red-600 text-xs"></span>
+            <div class="flex items-end gap-2 mb-4">
+                <!-- Existing company dropdown -->
+                <div class="flex-1">
+                    <label asp-for="Command.Users.CompanyId" class="block text-sm font-semibold text-gray-700 mb-1">
+                        Company
+                    </label>
+                    <select asp-for="Command.Users.CompanyId" asp-items="ViewBag.CompanyId"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2
+                       focus:ring-blue-500 focus:outline-none">
+                        <option value="">-- Select Company --</option>
+                    </select>
+                    <span asp-validation-for="Command.Users.CompanyId" class="text-red-600 text-xs"></span>
+                </div>
+
+                <!-- + Add Company button -->
+                <button id="btnAddCompany"
+                        type="button"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg">
+                    +
+                </button>
+            </div>
+
+            <!-- Hidden form to add new company -->
+            <div id="addCompanyForm" class="hidden border border-gray-300 rounded-lg p-4 mb-4 bg-gray-50">
+                <h3 class="text-sm font-semibold text-gray-700 mb-2">Add New Company</h3>
+
+                <div class="mb-2">
+                    <label for="companyName" class="block text-sm font-medium text-gray-600">Company Name</label>
+                    <input type="text" id="companyName" class="w-full border rounded-lg px-3 py-2" placeholder="Enter company name">
+                </div>
+
+                <div class="mb-2">
+                    <label for="fullAddress" class="block text-sm font-medium text-gray-600">Full Address</label>
+                    <input type="text" id="fullAddress" class="w-full border rounded-lg px-3 py-2" placeholder="Enter full address">
+                </div>
+
+                <div class="mb-3">
+                    <label for="contactNumber" class="block text-sm font-medium text-gray-600">Contact Number</label>
+                    <input type="text" id="contactNumber" class="w-full border rounded-lg px-3 py-2" placeholder="Enter contact number">
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button id="btnCancelAdd" type="button"
+                            class="px-3 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+                        Cancel
+                    </button>
+                    <button id="btnSaveCompany" type="button"
+                            class="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                        Save
+                    </button>
+                </div>
             </div>
 
             <!-- Role -->
@@ -83,4 +126,61 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(function () {
+            // Toggle the company form
+            $("#btnAddCompany").on("click", function () {
+                $("#addCompanyForm").toggleClass("hidden");
+            });
+
+            // Cancel button hides form
+            $("#btnCancelAdd").on("click", function () {
+                $("#addCompanyForm").addClass("hidden");
+            });
+
+            // Save new company
+            $("#btnSaveCompany").on("click", async function () {
+                const company = {
+                    companyName: $("#companyName").val(),
+                    fullAddress: $("#fullAddress").val(),
+                    contactNumber: $("#contactNumber").val()
+                };
+
+                if (!company.companyName) {
+                    alert("Please enter a company name.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("http://localhost:5040/api/company", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(company)
+                    });
+
+                    if (response.ok) {
+                        const newCompany = await response.json();
+                        //console.log(newCompany)
+
+                        // Add to dropdown dynamically
+                        $("#Command_Users_CompanyId")
+                            .append(`<option value="${newCompany.company.companyId}">${newCompany.company.companyName}</option>`)
+                            .val(newCompany.company.companyId);
+
+                        alert("Company added successfully!");
+                        $("#addCompanyForm").addClass("hidden");
+                        $("#companyName, #fullAddress, #contactNumber").val("");
+                    } else {
+                        const errorText = await response.text();
+                        alert("Error adding company: " + errorText);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Failed to connect to the server.");
+                }
+            });
+        });
+    </script>
 }

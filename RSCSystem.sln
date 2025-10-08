@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadSignCapture.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadSignCapture.Tests", "src\RoadSignCapture.Tests\RoadSignCapture.Tests.csproj", "{86119331-4535-45D8-83C1-B5ED11394165}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadSignCapture.API", "src\RoadSignCapture.API\RoadSignCapture.API.csproj", "{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,18 @@ Global
 		{86119331-4535-45D8-83C1-B5ED11394165}.Release|x64.Build.0 = Release|Any CPU
 		{86119331-4535-45D8-83C1-B5ED11394165}.Release|x86.ActiveCfg = Release|Any CPU
 		{86119331-4535-45D8-83C1-B5ED11394165}.Release|x86.Build.0 = Release|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Debug|x64.Build.0 = Debug|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Release|x64.ActiveCfg = Release|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Release|x64.Build.0 = Release|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +94,7 @@ Global
 		{D43572A4-3F0A-47A8-AD36-5F934AB9DA16} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{47B2BFAD-BC08-4982-840D-24A61C0FE9E4} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{86119331-4535-45D8-83C1-B5ED11394165} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{D1973580-0BC7-45E3-AFDC-DEB9D26514E5} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E7A635D-8780-4DD0-8DE1-E62E5977C8CE}

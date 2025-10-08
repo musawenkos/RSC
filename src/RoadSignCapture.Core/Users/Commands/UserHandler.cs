@@ -78,6 +78,8 @@ namespace RoadSignCapture.Core.Users.Commands
             return Result.SuccessResult();
         }
 
+
+
         public record Result(bool Success, string? Error = null)
         {
             public static Result SuccessResult()
