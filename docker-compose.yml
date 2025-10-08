@@ -18,8 +18,11 @@ services:
       - AzureAd__Instance=${AZ_INSTANCE}
       - MicrosoftGraph__BaseUrl=${MG_BASE_URL}
       - MicrosoftGraph__Scopes=${SCOPES}
+      - API_BASE_URL=http://rsc-api:5040
     depends_on:
       - rsc-db
+    networks:
+      - rsc-network
 
   rsc-api:
     image: ghcr.io/musawenkosi/rsc-api:latest
@@ -34,6 +37,8 @@ services:
     - ASPNETCORE_URLS=http://+:5040
     depends_on:
     - rsc-db
+    networks:
+    - rsc-network
 
   rsc-db:
     container_name: rsc-db
@@ -45,6 +50,12 @@ services:
       - "1433:1433"
     volumes:
       - sqlserverdata:/var/opt/mssql
+    networks:
+      - rsc-network
+
+networks:
+  rsc-network:
+    driver: bridge
 
 volumes:
   sqlserverdata:
