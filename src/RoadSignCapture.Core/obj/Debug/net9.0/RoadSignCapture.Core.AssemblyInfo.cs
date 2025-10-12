@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RoadSignCapture.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8640db59489522633f3387cd28b16e0f82cd7b05")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f9570e6f7b14bd9a9bba5b3876d2295a489cce9")]
 [assembly: System.Reflection.AssemblyProductAttribute("RoadSignCapture.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RoadSignCapture.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

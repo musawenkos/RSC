@@ -149,3 +149,22 @@ jobs:
 
             echo "🚀 Deploying containers..."
             docker compose up -d
+
+      - name: Install EF Core Tools
+        run: dotnet tool install --global dotnet-ef
+      
+      - name: Run Database Migration
+        run: |
+          dotnet ef database update \
+            --project src/RoadSignCapture.Infrastructure/RoadSignCapture.Infrastructure.csproj \
+            --startup-project src/RoadSignCapture.Web/RoadSignCapture.Web.csproj \
+            --connection "${{ secrets.DB_CONNECTION_STRING }}"
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          
+      - name: Verify Migration
+        run: |
+          dotnet ef migrations list \
+            --project src/RoadSignCapture.Infrastructure/RoadSignCapture.Infrastructure.csproj \
+            --startup-project src/RoadSignCapture.Web/RoadSignCapture.Web.csproj \
+            --connection "${{ secrets.DB_CONNECTION_STRING }}"

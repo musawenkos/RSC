@@ -18,6 +18,8 @@ public partial class RSCDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Project> Projects { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Company>(entity =>
@@ -72,6 +74,70 @@ public partial class RSCDbContext : DbContext
                         j.ToTable("UserRole");
                         j.IndexerProperty<string>("UserEmail").HasMaxLength(256);
                     });
+
+            entity.HasMany(d => d.Projects).WithMany(p => p.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ProjectUser",
+                    r => r.HasOne<Project>().WithMany()
+                        .HasForeignKey("ProjectName")
+                        .HasConstraintName("FK_ProjectUser_Project")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    l => l.HasOne<User>().WithMany()
+                        .HasForeignKey("UserEmail")
+                        .HasConstraintName("FK_ProjectUser_User")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j =>
+                    {
+                        j.HasKey("ProjectName", "UserEmail");
+                        j.ToTable("ProjectUser");
+                        j.IndexerProperty<string>("ProjectName").HasMaxLength(255);
+                        j.IndexerProperty<string>("UserEmail").HasMaxLength(256);
+                    });
+
+        });
+
+        modelBuilder.Entity<Project>(entity =>
+        {
+            entity.HasKey(e => e.ProjectName).HasName("PK_Project");
+            entity.ToTable("Project");
+            entity.Property(e => e.ProjectName).HasMaxLength(255);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.Created).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Updated).HasDefaultValueSql("(getutcdate())");
+        });
+
+        var seedDate = new DateTime(2025, 01, 01);
+
+        modelBuilder.Entity<Company>().HasData(new Company
+        {
+            CompanyId = 1,
+            CompanyName = "MJNEXUS SYSTEMS",
+            FullAddress = "Head Office",
+            ContactNumber = "0732347796",
+            Created = seedDate,
+            Updated = seedDate
+        });
+
+        modelBuilder.Entity<Role>().HasData(
+            new Role { RoleId = 1, RoleName = "SysAdmin" },
+            new Role { RoleId = 2, RoleName = "Designer" },
+            new Role { RoleId = 3, RoleName = "Client" },
+            new Role { RoleId = 4, RoleName = "Viewer" }
+        );
+
+        modelBuilder.Entity<User>().HasData(new User
+        {
+            Email = "ndlelamusa1st@gmail.com",
+            DisplayName = "M Ndlela",
+            CompanyId = 1,
+            Created = seedDate,
+            Updated = seedDate
+        });
+        
+         modelBuilder.Entity("UserRole").HasData(new
+        {
+            UserEmail = "ndlelamusa1st@gmail.com",
+            RoleId = 1
         });
 
         OnModelCreatingPartial(modelBuilder);
