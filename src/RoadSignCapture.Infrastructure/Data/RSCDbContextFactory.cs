@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.IO;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using System.IO;
+
 
 namespace RoadSignCapture.Infrastructure.Data
 {
@@ -12,8 +14,11 @@ namespace RoadSignCapture.Infrastructure.Data
             // Build configuration from Web project's appsettings.json
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../src/RoadSignCapture.Web"))
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables() // ✅ allows use of env vars (ConnectionStrings__DefaultConnection)
+                .AddCommandLine(args)      // ✅ supports --connection or --environment args
                 .Build();
+
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             Console.WriteLine($"Using connection string: {connectionString}");

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "5waUT4O1gvQ=",
+  "dgSpecHash": "koX/nOmmUMk=",
   "success": true,
   "projectFilePath": "C:\\Users\\ndlel\\Documents\\MJNEXUS Systems\\Projects\\RSC\\src\\RoadSignCapture.Infrastructure\\RoadSignCapture.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -30,6 +30,8 @@
     "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.caching.memory\\9.0.9\\microsoft.extensions.caching.memory.9.0.9.nupkg.sha512",
     "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.configuration\\9.0.9\\microsoft.extensions.configuration.9.0.9.nupkg.sha512",
     "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\9.0.9\\microsoft.extensions.configuration.abstractions.9.0.9.nupkg.sha512",
+    "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.configuration.commandline\\9.0.9\\microsoft.extensions.configuration.commandline.9.0.9.nupkg.sha512",
+    "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.configuration.environmentvariables\\9.0.9\\microsoft.extensions.configuration.environmentvariables.9.0.9.nupkg.sha512",
     "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.configuration.fileextensions\\9.0.9\\microsoft.extensions.configuration.fileextensions.9.0.9.nupkg.sha512",
     "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.configuration.json\\9.0.9\\microsoft.extensions.configuration.json.9.0.9.nupkg.sha512",
     "C:\\Users\\ndlel\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\9.0.9\\microsoft.extensions.dependencyinjection.9.0.9.nupkg.sha512",
