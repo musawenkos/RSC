@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using RoadSignCapture.Infrastructure.Data;
 using RoadSignCapture.Core.Services;
 using RoadSignCapture.Core.Users.Commands;
-using RoadSignCapture.Infrastructure.Data;
 using RoadSignCapture.Infrastructure.Services;
 using System.Security.Claims;
 
@@ -197,31 +199,31 @@ app.MapControllers();
 
 app.Run();
 
+// <summary>
+/// Automatically applies pending migrations when the application starts
+/// </summary>
 static async Task MigrateDatabaseAsync(WebApplication app)
 {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILogger<Program>>();
-
+    
     try
     {
         var context = services.GetRequiredService<RSCDbContext>();
-
+        
         logger.LogInformation("Starting database migration...");
-        logger.LogInformation($"Database: {context.Database}");
-        logger.LogInformation(context.Database.GetDbConnection().ConnectionString);
-
+        
         // Check if database exists
         var canConnect = await context.Database.CanConnectAsync();
-
         if (!canConnect)
         {
             logger.LogWarning("Cannot connect to database. Waiting for database to be available...");
-
+            
             // Retry logic
             var maxRetries = 10;
             var retryCount = 0;
-
+            
             while (!canConnect && retryCount < maxRetries)
             {
                 await Task.Delay(5000); // Wait 5 seconds
@@ -229,16 +231,16 @@ static async Task MigrateDatabaseAsync(WebApplication app)
                 retryCount++;
                 logger.LogInformation($"Retry {retryCount}/{maxRetries}...");
             }
-
+            
             if (!canConnect)
             {
-                throw new Exception("Could not connect to database after multiple retries");
+                throw new Exception("Could not connect to database after multiple");
             }
         }
-
+        
         // Get pending migrations
         var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-
+        
         if (pendingMigrations.Any())
         {
             logger.LogInformation($"Found {pendingMigrations.Count()} pending migrations:");
@@ -246,18 +248,18 @@ static async Task MigrateDatabaseAsync(WebApplication app)
             {
                 logger.LogInformation($"  - {migration}");
             }
-
+            
             // Apply migrations
             logger.LogInformation("Applying migrations...");
             await context.Database.MigrateAsync();
-
+            
             logger.LogInformation("✅ Database migration completed successfully");
         }
         else
         {
             logger.LogInformation("Database is already up to date");
         }
-
+        
         // Log applied migrations
         var appliedMigrations = await context.Database.GetAppliedMigrationsAsync();
         logger.LogInformation($"Total applied migrations: {appliedMigrations.Count()}");
@@ -265,7 +267,7 @@ static async Task MigrateDatabaseAsync(WebApplication app)
     catch (Exception ex)
     {
         logger.LogError(ex, "❌ An error occurred while migrating the database");
-
+        
         // Decide whether to throw or continue
         if (app.Environment.IsProduction())
         {

@@ -31,7 +31,7 @@ namespace RoadSignCapture.Infrastructure.Data
             {
                 throw new InvalidOperationException(
                     "Connection string 'DefaultConnection' not found. " +
-                    "Provide it via appsettings.json, environment variable, or --connection parameter.");
+                    "Provide it via appsettings.json, environment variable, or --connection string parameter.");
             }
 
             Console.WriteLine($"Using connection string: {connectionString}");
