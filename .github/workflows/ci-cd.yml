@@ -147,10 +147,15 @@ jobs:
             docker compose pull rsc-web
             docker compose pull rsc-api
 
-            docker compose run --rm -e ConnectionStrings__DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
-              rsc-web dotnet ef database update \
-              --project /app/src/RoadSignCapture.Infrastructure/RoadSignCapture.Infrastructure.csproj \
-              --startup-project /app/src/RoadSignCapture.Web/RoadSignCapture.Web.csproj
+            echo "🚀 Starting database container first..."
+            docker compose up -d rsc-db
+
+            # Wait for database to be ready
+            echo "⏳ Waiting for database to be ready..."
+            sleep 20
+
+            echo "🗃️ Running database migrations..."
+            docker compose --profile migration run --rm rsc-migration
 
             echo "🚀 Deploying containers..."
             docker compose up -d
