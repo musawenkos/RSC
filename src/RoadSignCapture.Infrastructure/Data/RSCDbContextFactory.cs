@@ -25,6 +25,8 @@ namespace RoadSignCapture.Infrastructure.Data
                 Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
                 configuration["ConnectionStrings:DefaultConnection"];
 
+            Console.WriteLine($"Using connection string: {connectionString}");
+
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException(
