@@ -15,8 +15,8 @@ namespace RoadSignCapture.Infrastructure.Data
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../src/RoadSignCapture.Web"))
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables() // ✅ allows use of env vars (ConnectionStrings__DefaultConnection)
-                .AddCommandLine(args)      // ✅ supports --connection or --environment args
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
                 .Build();
 
 

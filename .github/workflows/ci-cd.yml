@@ -147,24 +147,22 @@ jobs:
             docker compose pull rsc-web
             docker compose pull rsc-api
 
+            # Wait for database to be ready
+            echo "⏳ Waiting for database to be ready..."
+            sleep 15
+
+            echo "🗃️ Running database migrations..."
+            # Install dotnet-ef if not already installed
+            if ! command -v dotnet-ef &> /dev/null; then
+                dotnet tool install --global dotnet-ef
+                export PATH="$PATH:$HOME/.dotnet/tools"
+            fi
+            
+            # Run migrations
+            dotnet ef database update \
+              --project src/RoadSignCapture.Infrastructure/RoadSignCapture.Infrastructure.csproj \
+              --startup-project src/RoadSignCapture.Web/RoadSignCapture.Web.csproj \
+              --connection "Server=localhost,1433;Database=RoadSignCaptureDb;User Id=sa;Password=RoadSignCapture2024!;Encrypt=False;TrustServerCertificate=True;"
+
             echo "🚀 Deploying containers..."
             docker compose up -d
-
-      - name: Install EF Core Tools
-        run: dotnet tool install --global dotnet-ef
-      
-      - name: Run Database Migration
-        run: |
-          dotnet ef database update \
-            --project src/RoadSignCapture.Infrastructure/RoadSignCapture.Infrastructure.csproj \
-            --startup-project src/RoadSignCapture.Web/RoadSignCapture.Web.csproj \
-            --connection "Server=localhost,1433;Database=RoadSignCaptureDb;User Id=sa;Password=RoadSignCapture2024!;Encrypt=False;TrustServerCertificate=True;"
-        env:
-          ASPNETCORE_ENVIRONMENT: Development
-          
-      - name: Verify Migration
-        run: |
-          dotnet ef migrations list \
-            --project src/RoadSignCapture.Infrastructure/RoadSignCapture.Infrastructure.csproj \
-            --startup-project src/RoadSignCapture.Web/RoadSignCapture.Web.csproj \
-            --connection "Server=localhost,1433;Database=RoadSignCaptureDb;User Id=sa;Password=RoadSignCapture2024!;Encrypt=False;TrustServerCertificate=True;"
