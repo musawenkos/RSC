@@ -147,15 +147,5 @@ jobs:
             docker compose pull rsc-web
             docker compose pull rsc-api
 
-            echo "🚀 Starting database container first..."
-            docker compose up -d rsc-db
-
-            # Wait for database to be ready
-            echo "⏳ Waiting for database to be ready..."
-            sleep 20
-
-            echo "🗃️ Running database migrations..."
-            docker compose --profile migration run --rm rsc-migration
-
             echo "🚀 Deploying containers..."
             docker compose up -d

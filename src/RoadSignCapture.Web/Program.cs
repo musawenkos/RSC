@@ -1,4 +1,4 @@
-using Auth0.AspNetCore.Authentication;
+﻿using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -29,9 +29,15 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardLimit = null;
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<RSCDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions
+            .EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null)
+    ));
 
 // Configure Auth0 Authentication
 builder.Services
@@ -154,6 +160,8 @@ var app = builder.Build();
 // CRITICAL: UseForwardedHeaders MUST be first
 app.UseForwardedHeaders();
 
+await MigrateDatabaseAsync(app);
+
 // CRITICAL: Set the path base for apps hosted in subdirectories
 
 //app.UsePathBase("/RoadSignCapture/");
@@ -188,3 +196,83 @@ app.MapRazorPages();
 app.MapControllers();
 
 app.Run();
+
+static async Task MigrateDatabaseAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        var context = services.GetRequiredService<RSCDbContext>();
+
+        logger.LogInformation("Starting database migration...");
+
+        // Check if database exists
+        var canConnect = await context.Database.CanConnectAsync();
+        if (!canConnect)
+        {
+            logger.LogWarning("Cannot connect to database. Waiting for database to be available...");
+
+            // Retry logic
+            var maxRetries = 10;
+            var retryCount = 0;
+
+            while (!canConnect && retryCount < maxRetries)
+            {
+                await Task.Delay(5000); // Wait 5 seconds
+                canConnect = await context.Database.CanConnectAsync();
+                retryCount++;
+                logger.LogInformation($"Retry {retryCount}/{maxRetries}...");
+            }
+
+            if (!canConnect)
+            {
+                throw new Exception("Could not connect to database after multiple retries");
+            }
+        }
+
+        // Get pending migrations
+        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+
+        if (pendingMigrations.Any())
+        {
+            logger.LogInformation($"Found {pendingMigrations.Count()} pending migrations:");
+            foreach (var migration in pendingMigrations)
+            {
+                logger.LogInformation($"  - {migration}");
+            }
+
+            // Apply migrations
+            logger.LogInformation("Applying migrations...");
+            await context.Database.MigrateAsync();
+
+            logger.LogInformation("✅ Database migration completed successfully");
+        }
+        else
+        {
+            logger.LogInformation("Database is already up to date");
+        }
+
+        // Log applied migrations
+        var appliedMigrations = await context.Database.GetAppliedMigrationsAsync();
+        logger.LogInformation($"Total applied migrations: {appliedMigrations.Count()}");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "❌ An error occurred while migrating the database");
+
+        // Decide whether to throw or continue
+        if (app.Environment.IsProduction())
+        {
+            // In production, you might want to fail fast
+            throw;
+        }
+        else
+        {
+            // In development, you might want to continue
+            logger.LogWarning("Continuing despite migration error (Development mode)");
+        }
+    }
+}

@@ -40,19 +40,6 @@ services:
     networks:
     - rsc-network
 
-  rsc-migration:
-    image: ghcr.io/musawenkos/rsc-web:latest
-    environment:
-      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
-      - ASPNETCORE_ENVIRONMENT=Development
-    depends_on:
-      - rsc-db
-    networks:
-      - rsc-network
-    entrypoint: ["dotnet", "ef", "database", "update", "--project", "/app/src/RoadSignCapture.Infrastructure/RoadSignCapture.Infrastructure.csproj", "--startup-project", "/app/src/RoadSignCapture.Web/RoadSignCapture.Web.csproj"]
-    profiles:
-      - migration
-
   rsc-db:
     container_name: rsc-db
     image: mcr.microsoft.com/mssql/server:2022-latest
