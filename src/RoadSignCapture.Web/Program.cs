@@ -208,9 +208,12 @@ static async Task MigrateDatabaseAsync(WebApplication app)
         var context = services.GetRequiredService<RSCDbContext>();
 
         logger.LogInformation("Starting database migration...");
+        logger.LogInformation($"Database: {context.Database}");
+        logger.LogInformation(context.Database.GetDbConnection().ConnectionString);
 
         // Check if database exists
         var canConnect = await context.Database.CanConnectAsync();
+
         if (!canConnect)
         {
             logger.LogWarning("Cannot connect to database. Waiting for database to be available...");
