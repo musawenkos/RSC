@@ -11,6 +11,8 @@ namespace RoadSignCapture.Core.Services
     public interface IUserService
     {
         Task<IList<User>> GetAllUsersAsync(string authUserEmail);
+
+        Task<IList<User>> GetAllUsersAsync();
         Task<UserDto?> GetUserDetailsBy(string email);
         Task AddAsync(User user);
         Task SaveChangesAsync();

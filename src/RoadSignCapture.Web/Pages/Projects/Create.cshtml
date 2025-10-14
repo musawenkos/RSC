@@ -1,0 +1,79 @@
+﻿@page
+@model RoadSignCapture.Web.Pages.Projects.CreateModel
+@{
+    ViewData["Title"] = "Create Project";
+}
+
+<div class="container mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
+        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <i class="bi bi-folder-plus text-blue-600"></i> Create Project
+        </h1>
+
+        <a asp-page="Index"
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100
+                  hover:bg-gray-200 rounded-lg shadow-sm transition duration-200">
+            <i class="bi bi-arrow-left-short mr-2"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white shadow-md rounded-lg border border-gray-100 p-6">
+        <form method="post" class="space-y-6">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm mb-3"></div>
+
+            <!-- Project Name -->
+            <div>
+                <label asp-for="Command.ProjectName" class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                <input asp-for="Command.ProjectName"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2
+                              focus:ring-blue-500 focus:outline-none"
+                       placeholder="Enter project name" />
+                <span asp-validation-for="Command.ProjectName" class="text-red-600 text-xs"></span>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label asp-for="Command.ProjectDescription" class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                <textarea asp-for="Command.ProjectDescription"
+                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2
+                                 focus:ring-blue-500 focus:outline-none"
+                          rows="3" placeholder="Enter project description"></textarea>
+                <span asp-validation-for="Command.ProjectDescription" class="text-red-600 text-xs"></span>
+            </div>
+
+            <!-- Assign Users -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Assign Users</label>
+                <select asp-for="Command.SelectedUsers"
+                        asp-items="Model.UsersList"
+                        multiple
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white
+                               focus:ring-2 focus:ring-blue-500 focus:outline-none h-40">
+                </select>
+                <span asp-validation-for="Command.SelectedUsers" class="text-red-600 text-xs"></span>
+                <p class="text-gray-500 text-xs mt-1">Hold Ctrl (Windows) or Command (Mac) to select multiple users.</p>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex justify-end space-x-3 pt-4">
+                <a asp-page="Index"
+                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100
+                          hover:bg-gray-200 rounded-lg shadow-sm transition">
+                    Cancel
+                </a>
+
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600
+                               hover:bg-blue-700 rounded-lg shadow-md transition duration-200">
+                    <i class="bi bi-check-circle mr-2"></i> Create Project
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

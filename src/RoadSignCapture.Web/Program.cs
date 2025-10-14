@@ -11,6 +11,7 @@ using RoadSignCapture.Core.Services;
 using RoadSignCapture.Core.Users.Commands;
 using RoadSignCapture.Infrastructure.Services;
 using System.Security.Claims;
+using RoadSignCapture.Core.Projects.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -151,8 +152,10 @@ builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRole, UserRoleService>();
+builder.Services.AddScoped<IProjectService,ProjectService>();
 
 builder.Services.AddScoped<UserHandler>();
+builder.Services.AddScoped<ProjectHandler>();
 
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();

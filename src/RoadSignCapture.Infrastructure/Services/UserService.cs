@@ -29,6 +29,16 @@ namespace RoadSignCapture.Infrastructure.Services
                 .ToListAsync();
         }
 
+        public async Task<IList<User>> GetAllUsersAsync()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Include(c => c.Company)
+                .Include(r => r.Roles)
+                .OrderByDescending(u => u.Created)
+                .ToListAsync();
+        }
+
         public async Task<User?> GetUserBy(string userEmail) => await _context.Users.FindAsync(userEmail);
 
         public async Task<UserDto?> GetUserDetailsBy(string email)

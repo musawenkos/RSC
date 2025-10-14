@@ -38,7 +38,7 @@ namespace RoadSignCapture.Web.Pages.Users
 
         public async Task<IActionResult> OnGet()
         {
-            // Remove the company context
+            //TODO: Remove the company context
             ViewData["CompanyId"] = new SelectList(_context.Companies, "CompanyId", "CompanyName");
             RoleList = new SelectList(await _roleService.GetAllAsync(), "RoleId", "RoleName");
             return Page();

@@ -58,11 +58,11 @@ namespace RoadSignCapture.Core.Companies.Commands
             return Result.SuccessResult();
         }
 
-        public record Result(bool Success,Company? company = null, string? Error = null)
+        public record Result(bool Success,Company? Company = null, string? Error = null)
         {
             public static Result SuccessResult(Company? c = null)
             {
-                return new(true,company: c);
+                return new(true,Company: c);
             }
 
             public static Result Failure(string error) => new(false,Error: error);

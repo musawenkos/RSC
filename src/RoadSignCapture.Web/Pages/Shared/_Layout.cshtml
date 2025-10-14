@@ -34,6 +34,10 @@
                     {
                         <a class="@(Context.Request.Path.StartsWithSegments("/Users") ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600")"
                            asp-area="" asp-page="/Users/Index">Users</a>
+
+                        <a class="@(Context.Request.Path.StartsWithSegments("/Projects") ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600")"
+                           asp-area="" asp-page="/Projects/Index">Projects</a>
+
                     }
                 </div>
 
