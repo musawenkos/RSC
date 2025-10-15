@@ -1,69 +1,145 @@
 ﻿@page
 @model RoadSignCapture.Web.Pages.Projects.IndexModel
 @{
-    ViewData["Title"] = "Projects";
+    ViewData["Title"] = "Projects Dashboard";
 }
 
-<div class="container mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
-        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <i class="bi bi-folder2-open text-blue-600"></i> Projects
-        </h1>
+<div class="flex h-screen bg-gray-100 overflow-hidden">
 
-        <a asp-page="Create"
-           class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600
-                  hover:bg-blue-700 rounded-lg shadow transition duration-200">
-            <i class="bi bi-plus-circle mr-2"></i> Create New
-        </a>
-    </div>
+    <!-- Sidebar -->
+    <aside id="sidebar"
+           class="w-80 bg-white shadow-md border-r border-gray-200 flex flex-col transition-all duration-300">
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="bi bi-folder2-open text-blue-600"></i>
+                Projects
+            </h2>
 
-    <!-- Table -->
-    @if (Model.Project != null && Model.Project.Any())
-    {
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-100">
-            <table class="min-w-full text-sm text-left text-gray-600">
-                <thead class="bg-gray-100 text-gray-800 uppercase text-xs">
-                    <tr>
-                        <th class="px-6 py-3">Project Name</th>
-                        <th class="px-6 py-3">Description</th>
-                        <th class="px-6 py-3">Created</th>
-                        <th class="px-6 py-3">Updated</th>
-                        <th class="px-6 py-3 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <a asp-page="Create"
+               class="inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow transition duration-200">
+                <i class="bi bi-plus-lg text-lg"></i>
+            </a>
+        </div>
+
+        <!-- Project List View -->
+        <div id="projectListView" class="flex-1 overflow-y-auto">
+            @if (Model.Project != null && Model.Project.Any())
+            {
+                <ul class="divide-y divide-gray-100">
                     @foreach (var item in Model.Project)
                     {
-                        <tr class="border-b hover:bg-gray-50 transition">
-                            <td class="px-6 py-3 font-medium text-gray-900">@item.ProjectName</td>
-                            <td class="px-6 py-3 font-medium text-gray-900">@item.Description</td>
-                            <td class="px-6 py-3">@item.Created.ToString("yyyy-MM-dd")</td>
-                            <td class="px-6 py-3">@item.Updated.ToString("yyyy-MM-dd")</td>
-                            <td class="px-6 py-3 text-center space-x-3">
-                                <a asp-page="./Edit" asp-route-id="@item.ProjectName"
-                                   class="text-blue-600 hover:text-blue-800 font-medium transition">
-                                    Edit
-                                </a>
-                                <span class="text-gray-300">|</span>
-                                <a asp-page="./Details" asp-route-id="@item.ProjectName"
-                                   class="text-green-600 hover:text-green-800 font-medium transition">
-                                    Details
-                                </a>
-                                <span class="text-gray-300">|</span>
-                                <a asp-page="./Delete" asp-route-id="@item.ProjectName"
-                                   class="text-red-600 hover:text-red-800 font-medium transition">
-                                    Delete
-                                </a>
-                            </td>
-                        </tr>
+                        <li class="px-5 py-4 hover:bg-blue-50 cursor-pointer transition"
+                            onclick="showProjectDetails('@item.ProjectName', '@item.Description')">
+                            <div class="font-semibold text-gray-800">@item.ProjectName</div>
+                            <div class="text-sm text-gray-500 truncate">@item.Description</div>
+                        </li>
                     }
-                </tbody>
-            </table>
+                </ul>
+            }
+            else
+            {
+                <p class="text-gray-500 italic text-center py-8">No projects found.</p>
+            }
         </div>
-    }
-    else
-    {
-        <p class="text-gray-500 italic text-center py-8">No projects found.</p>
-    }
+
+        <!-- Project Detail View -->
+        <div id="projectDetailView" class="hidden flex-1 flex-col">
+            <!-- Header -->
+            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 id="detailProjectName" class="text-lg font-bold text-gray-800"></h2>
+                    <p id="detailProjectDesc" class="text-sm text-gray-500"></p>
+                </div>
+                <button onclick="backToProjects()" class="text-blue-600 hover:text-blue-800 transition">
+                    <i class="bi bi-arrow-left-circle text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Tabs Section -->
+            <div class="flex justify-around mt-2 border-b border-gray-100">
+                <button class="py-2 px-3 text-gray-600 hover:text-blue-600 font-medium text-sm transition"
+                        onclick="switchTab('overview')">
+                    Overview
+                </button>
+                <button class="py-2 px-3 text-gray-600 hover:text-blue-600 font-medium text-sm transition"
+                        onclick="switchTab('routes')">
+                    Routes
+                </button>
+                <button class="py-2 px-3 text-gray-600 hover:text-blue-600 font-medium text-sm transition"
+                        onclick="switchTab('signs')">
+                    Signs
+                </button>
+                <button class="py-2 px-3 text-gray-600 hover:text-blue-600 font-medium text-sm transition"
+                        onclick="switchTab('photos')">
+                    Photos
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tabContent" class="flex-1 overflow-y-auto p-5">
+                <div id="overviewTab">
+                    <h3 class="font-semibold text-gray-700 mb-2">Project Overview</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Select a tab above to view project routes, signs, or photos.
+                    </p>
+                </div>
+
+                <div id="routesTab" class="hidden">
+                    <h3 class="font-semibold text-gray-700 mb-2">Route Information</h3>
+                    <p class="text-gray-600 text-sm">Display route data, GPS coordinates, and related road info here.</p>
+                </div>
+
+                <div id="signsTab" class="hidden">
+                    <h3 class="font-semibold text-gray-700 mb-2">Signs Details</h3>
+                    <p class="text-gray-600 text-sm">Include information such as SARTSM code, sign type, installation status, etc.</p>
+                </div>
+
+                <div id="photosTab" class="hidden">
+                    <h3 class="font-semibold text-gray-700 mb-2">Project Photos</h3>
+                    <p class="text-gray-600 text-sm">Uploaded photos will appear here.</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Map View -->
+    <main class="flex-1 relative">
+        <div class="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-500 text-lg font-semibold">
+            Map View Area (Placeholder)
+        </div>
+    </main>
 </div>
+
+<!-- Scripts -->
+@section Scripts {
+    <script>
+        function showProjectDetails(name, desc) {
+            // Fill details
+            document.getElementById('detailProjectName').innerText = name;
+            document.getElementById('detailProjectDesc').innerText = desc;
+
+            // Hide project list, show details
+            document.getElementById('projectListView').classList.add('hidden');
+            document.getElementById('projectDetailView').classList.remove('hidden');
+        }
+
+        function backToProjects() {
+            // Return to project list
+            document.getElementById('projectDetailView').classList.add('hidden');
+            document.getElementById('projectListView').classList.remove('hidden');
+        }
+
+        function switchTab(tabName) {
+            const tabs = ['overview', 'routes', 'signs', 'photos'];
+            tabs.forEach(tab => {
+                const tabDiv = document.getElementById(tab + 'Tab');
+                if (tab === tabName) {
+                    tabDiv.classList.remove('hidden');
+                } else {
+                    tabDiv.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+}
