@@ -74,6 +74,8 @@ namespace RoadSignCapture.Infrastructure.Services
                 clients.Add(u);
             }
 
+            _logger!.LogInformation("Project Function completed: {projectName}", projectName);
+
             return new ProjectDto
             { 
                 ProjectName = projectName,
