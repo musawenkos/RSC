@@ -1,0 +1,181 @@
+﻿@page
+@model RoadSignCapture.Web.Pages.Sign.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].SignIdNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].SignType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].SARTSMCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].RouteName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].NodeNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].Action)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].WidthMm)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].HeightMm)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].AreaM2)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].NumPoles)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].PoleDiameter)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].PoleLengthMm)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].ExcavationDepthCubicM)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].SupportType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].Latitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].Longitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].OffsetDistanceM)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].InstallationStatus)
+            </th>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].UpdatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].UpdatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].CreatedByUser)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sign[0].Client)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Sign) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SignIdNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SignType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SARTSMCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RouteName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NodeNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Action)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WidthMm)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HeightMm)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AreaM2)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumPoles)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PoleDiameter)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PoleLengthMm)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.ExcavationDepthCubicM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SupportType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Latitude)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Longitude)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OffsetDistanceM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InstallationStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedByUser.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.ProjectName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Client.Email)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

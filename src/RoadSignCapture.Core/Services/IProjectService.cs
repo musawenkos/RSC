@@ -12,7 +12,7 @@ namespace RoadSignCapture.Core.Services
     public interface IProjectService
     {
         Task<IList<Project>> GetAllProjectsAsync();
-        Task<ProjectDto?> GetProjectAsync(string projectName);
+        Task<ProjectDto?> GetProjectAsync(string projectName, string userRole = "");
         Task AddAsync(Project project);
         Task SaveChangesAsync();
         void Remove(Project project);

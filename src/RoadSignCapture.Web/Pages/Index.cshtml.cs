@@ -5,7 +5,6 @@ using System.Net;
 
 namespace RoadSignCapture.Web.Pages
 {
-    [AuthorizeForScopes(ScopeKeySection = "MicrosoftGraph:Scopes")]
     public class IndexModel : PageModel
     {
         public int TotalProjects { get; set; }

@@ -1,11 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RoadSignCapture.Core.Models;
 using RoadSignCapture.Core.Services;
 using RoadSignCapture.Core.Users.Queries;
 using RoadSignCapture.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,9 +17,13 @@ namespace RoadSignCapture.Infrastructure.Services
     public class UserService : IUserService
     {
         private readonly RSCDbContext _context;
-        public UserService(RSCDbContext contextRSC)
+        private readonly ILogger<UserService> _logger;
+        private readonly IUserRole _userRoleService;
+        public UserService(RSCDbContext contextRSC, ILogger<UserService> logger, IUserRole userRole)
         {
             _context = contextRSC;
+            _logger = logger;
+            _userRoleService = userRole;
         }
         public async Task<IList<User>> GetAllUsersAsync(string authenticatedUser)
         {
@@ -58,6 +65,37 @@ namespace RoadSignCapture.Infrastructure.Services
                 CompanyName = user.Company.CompanyName,
                 Roles = user.Roles.Select(r => r.RoleName).ToList()
             };
+        }
+
+        public async Task<UserDto> GetClientFrom(List<User> users)
+        {
+            try
+            {
+                var index = 0;
+                for (var i = 0; i < users.Count; i++) 
+                {
+                    var user = users[i];
+                    var roles = await _userRoleService.GetUserRolesAsync(user.Email);
+                    _logger.LogInformation(message: "Roles: {index}", roles);
+                    if (roles.Contains("Client"))
+                    {
+                        index = i; break;
+                    }
+                }
+                //if (index == 0) return null;
+                _logger.LogInformation(message: "User: {index}", users[index]);
+
+                return new UserDto
+                { 
+                    Email= users[index].Email
+                };
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogInformation(message: "Error: {Message}",ex.Message);
+                return new UserDto();
+            }
+            
         }
 
         public bool UserExists(string email) => _context.Users.Any(e => e.Email == email);

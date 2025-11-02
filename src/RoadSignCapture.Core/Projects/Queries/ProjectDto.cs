@@ -1,4 +1,5 @@
 ﻿using RoadSignCapture.Core.Models;
+using RoadSignCapture.Core.Users.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace RoadSignCapture.Core.Projects.Queries
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 
-        public List<User>? Clients { get; set; }
+        public List<UserDto>? Clients { get; set; }
 
     }
 }

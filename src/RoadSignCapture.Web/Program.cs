@@ -12,8 +12,11 @@ using RoadSignCapture.Core.Users.Commands;
 using RoadSignCapture.Infrastructure.Services;
 using System.Security.Claims;
 using RoadSignCapture.Core.Projects.Commands;
+using RoadSignCapture.Core.Signs.Commands;
+using RoadSignCapture.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // IMPORTANT: Configure forwarded headers FIRST before any authentication
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -153,9 +156,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRole, UserRoleService>();
 builder.Services.AddScoped<IProjectService,ProjectService>();
+builder.Services.AddScoped<ISignService, SignService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<IAudiTrailService, AuditTrailService>();
 
 builder.Services.AddScoped<UserHandler>();
 builder.Services.AddScoped<ProjectHandler>();
+builder.Services.AddScoped<SignHandler>();
+
+builder.Services.AddInfrastructure(configuration);
 
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();

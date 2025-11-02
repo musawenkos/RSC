@@ -1,0 +1,182 @@
+﻿@page
+@model RoadSignCapture.Web.Pages.Sign.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Sign</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Sign.Id" />
+            <div class="form-group">
+                
+                <label asp-for="Sign.SignIdNumber" class="control-label"></label>
+                <input asp-for="Sign.SignIdNumber" class="form-control" />
+                <span asp-validation-for="Sign.SignIdNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.SignType" class="control-label"></label>
+                <input asp-for="Sign.SignType" class="form-control" />
+                <span asp-validation-for="Sign.SignType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.SARTSMCode" class="control-label"></label>
+                <input asp-for="Sign.SARTSMCode" class="form-control" />
+                <span asp-validation-for="Sign.SARTSMCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.RouteName" class="control-label"></label>
+                <input asp-for="Sign.RouteName" class="form-control" />
+                <span asp-validation-for="Sign.RouteName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.NodeNumber" class="control-label"></label>
+                <input asp-for="Sign.NodeNumber" class="form-control" />
+                <span asp-validation-for="Sign.NodeNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.Action" class="control-label"></label>
+                <input asp-for="Sign.Action" class="form-control" />
+                <span asp-validation-for="Sign.Action" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.WidthMm" class="control-label"></label>
+                <input asp-for="Sign.WidthMm" class="form-control" />
+                <span asp-validation-for="Sign.WidthMm" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.HeightMm" class="control-label"></label>
+                <input asp-for="Sign.HeightMm" class="form-control" />
+                <span asp-validation-for="Sign.HeightMm" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.AreaM2" class="control-label"></label>
+                <input asp-for="Sign.AreaM2" class="form-control" />
+                <span asp-validation-for="Sign.AreaM2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.NumPoles" class="control-label"></label>
+                <input asp-for="Sign.NumPoles" class="form-control" />
+                <span asp-validation-for="Sign.NumPoles" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.PoleDiameter" class="control-label"></label>
+                <input asp-for="Sign.PoleDiameter" class="form-control" />
+                <span asp-validation-for="Sign.PoleDiameter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.PoleLengthMm" class="control-label"></label>
+                <input asp-for="Sign.PoleLengthMm" class="form-control" />
+                <span asp-validation-for="Sign.PoleLengthMm" class="text-danger"></span>
+            </div>
+           
+            <div class="form-group">
+                
+                <label asp-for="Sign.ExcavationDepthCubicM" class="control-label"></label>
+                <input asp-for="Sign.ExcavationDepthCubicM" class="form-control" />
+                <span asp-validation-for="Sign.ExcavationDepthCubicM" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.SupportType" class="control-label"></label>
+                <input asp-for="Sign.SupportType" class="form-control" />
+                <span asp-validation-for="Sign.SupportType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.Latitude" class="control-label"></label>
+                <input asp-for="Sign.Latitude" class="form-control" />
+                <span asp-validation-for="Sign.Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.Longitude" class="control-label"></label>
+                <input asp-for="Sign.Longitude" class="form-control" />
+                <span asp-validation-for="Sign.Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.OffsetDistanceM" class="control-label"></label>
+                <input asp-for="Sign.OffsetDistanceM" class="form-control" />
+                <span asp-validation-for="Sign.OffsetDistanceM" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.InstallationStatus" class="control-label"></label>
+                <input asp-for="Sign.InstallationStatus" class="form-control" />
+                <span asp-validation-for="Sign.InstallationStatus" class="text-danger"></span>
+            </div>
+           
+            <div class="form-group">
+                
+                <label asp-for="Sign.CreatedBy" class="control-label"></label>
+                <input asp-for="Sign.CreatedBy" class="form-control" />
+                <span asp-validation-for="Sign.CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.CreatedAt" class="control-label"></label>
+                <input asp-for="Sign.CreatedAt" class="form-control" />
+                <span asp-validation-for="Sign.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.UpdatedBy" class="control-label"></label>
+                <input asp-for="Sign.UpdatedBy" class="form-control" />
+                <span asp-validation-for="Sign.UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.UpdatedAt" class="control-label"></label>
+                <input asp-for="Sign.UpdatedAt" class="form-control" />
+                <span asp-validation-for="Sign.UpdatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.CreatedByUserId" class="control-label"></label>
+                <select asp-for="Sign.CreatedByUserId" class="form-control" asp-items="ViewBag.CreatedByUserId"></select>
+                <span asp-validation-for="Sign.CreatedByUserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.ProjectId" class="control-label"></label>
+                <select asp-for="Sign.ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <span asp-validation-for="Sign.ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Sign.ClientId" class="control-label"></label>
+                <select asp-for="Sign.ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
+                <span asp-validation-for="Sign.ClientId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

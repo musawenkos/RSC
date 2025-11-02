@@ -14,5 +14,6 @@ namespace RoadSignCapture.Core.Models
         public DateTime Updated { get; set; }
 
         public virtual ICollection<User> Users { get; set; } = new List<User>();
+        public ICollection<Sign> Signs { get; set; }
     }
 }

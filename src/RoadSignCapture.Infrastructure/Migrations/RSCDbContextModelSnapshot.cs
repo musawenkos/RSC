@@ -39,6 +39,51 @@ namespace RoadSignCapture.Infrastructure.Migrations
                     b.ToTable("ProjectUser", (string)null);
                 });
 
+            modelBuilder.Entity("RoadSignCapture.Core.Models.AuditTrail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeviceUsed")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LocationContext")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PerformedBy")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<Guid>("SignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Timestamp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getutcdate())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SignId");
+
+                    b.ToTable("AuditTrails");
+                });
+
             modelBuilder.Entity("RoadSignCapture.Core.Models.Company", b =>
                 {
                     b.Property<int>("CompanyId")
@@ -85,6 +130,48 @@ namespace RoadSignCapture.Infrastructure.Migrations
                             FullAddress = "Head Office",
                             Updated = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("RoadSignCapture.Core.Models.Photo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CapturedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getutcdate())");
+
+                    b.Property<string>("CapturedBy")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("SignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SignId");
+
+                    b.ToTable("Photos");
                 });
 
             modelBuilder.Entity("RoadSignCapture.Core.Models.Project", b =>
@@ -152,6 +239,117 @@ namespace RoadSignCapture.Infrastructure.Migrations
                             RoleId = 4,
                             RoleName = "Viewer"
                         });
+                });
+
+            modelBuilder.Entity("RoadSignCapture.Core.Models.Sign", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<double>("AreaM2")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<double>("ExcavationDepthCubicM")
+                        .HasColumnType("float");
+
+                    b.Property<double>("HeightMm")
+                        .HasColumnType("float");
+
+                    b.Property<string>("InstallationStatus")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("NodeNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("NumPoles")
+                        .HasColumnType("int");
+
+                    b.Property<double>("OffsetDistanceM")
+                        .HasColumnType("float");
+
+                    b.Property<string>("PoleDiameter")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<double>("PoleLengthMm")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ProjectId")
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("RouteName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SARTSMCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SignIdNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SignType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SupportType")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("WidthMm")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Signs");
                 });
 
             modelBuilder.Entity("RoadSignCapture.Core.Models.User", b =>
@@ -235,6 +433,52 @@ namespace RoadSignCapture.Infrastructure.Migrations
                         .HasConstraintName("FK_ProjectUser_User");
                 });
 
+            modelBuilder.Entity("RoadSignCapture.Core.Models.AuditTrail", b =>
+                {
+                    b.HasOne("RoadSignCapture.Core.Models.Sign", "Sign")
+                        .WithMany("AuditTrails")
+                        .HasForeignKey("SignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sign");
+                });
+
+            modelBuilder.Entity("RoadSignCapture.Core.Models.Photo", b =>
+                {
+                    b.HasOne("RoadSignCapture.Core.Models.Sign", "Sign")
+                        .WithMany("Photos")
+                        .HasForeignKey("SignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sign");
+                });
+
+            modelBuilder.Entity("RoadSignCapture.Core.Models.Sign", b =>
+                {
+                    b.HasOne("RoadSignCapture.Core.Models.User", "Client")
+                        .WithMany("Signs")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("RoadSignCapture.Core.Models.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("RoadSignCapture.Core.Models.Project", "Project")
+                        .WithMany("Signs")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Client");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("RoadSignCapture.Core.Models.User", b =>
                 {
                     b.HasOne("RoadSignCapture.Core.Models.Company", "Company")
@@ -267,6 +511,23 @@ namespace RoadSignCapture.Infrastructure.Migrations
             modelBuilder.Entity("RoadSignCapture.Core.Models.Company", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("RoadSignCapture.Core.Models.Project", b =>
+                {
+                    b.Navigation("Signs");
+                });
+
+            modelBuilder.Entity("RoadSignCapture.Core.Models.Sign", b =>
+                {
+                    b.Navigation("AuditTrails");
+
+                    b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("RoadSignCapture.Core.Models.User", b =>
+                {
+                    b.Navigation("Signs");
                 });
 #pragma warning restore 612, 618
         }

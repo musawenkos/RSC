@@ -29,4 +29,4 @@ RUN dotnet publish "RoadSignCapture.API.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "RoadSignCapture.API.dll"]
+CMD ["bash", "-c", "until (echo PING | nc ${REDIS_HOST} ${REDIS_PORT} | grep PONG); do echo 'Waiting for Redis...'; sleep 2; done && dotnet RoadSignCapture.API.dll"]

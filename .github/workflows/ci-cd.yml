@@ -22,12 +22,12 @@ jobs:
       mssql:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
-          SA_PASSWORD: "RoadSignCapture2024!"
+          SA_PASSWORD: "${{ secrets.DB_SA_PASSWORD }}"
           ACCEPT_EULA: "Y"
         ports:
           - 1433:1433
         options: >-
-          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'RoadSignCapture2024!' -Q 'SELECT 1' || exit 1"
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P '${{ secrets.DB_SA_PASSWORD }}' -Q 'SELECT 1' || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
@@ -139,6 +139,8 @@ jobs:
             export AZ_INSTANCE="${{ secrets.AZ_INSTANCE }}"
             export MG_BASE_URL="${{ secrets.MG_BASE_URL }}"
             export SCOPES="${{ secrets.SCOPES }}"
+            export REDIS_HOST="${{ secrets.REDIS_HOST }}"
+            export REDIS_PORT="${{ secrets.REDIS_PORT }}"
 
             echo "🔐 Logging in to GitHub Container Registry..."
             echo "${{ secrets.ORG_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin

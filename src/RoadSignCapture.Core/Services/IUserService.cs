@@ -14,6 +14,7 @@ namespace RoadSignCapture.Core.Services
 
         Task<IList<User>> GetAllUsersAsync();
         Task<UserDto?> GetUserDetailsBy(string email);
+        Task<UserDto> GetClientFrom(List<User> users);
         Task AddAsync(User user);
         Task SaveChangesAsync();
         Task<User?> GetUserBy(string email);

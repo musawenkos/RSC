@@ -1,0 +1,344 @@
+﻿@page
+@model RoadSignCapture.Web.Pages.Sign.CreateModel
+@{
+    ViewData["Title"] = "Create Sign";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Title -->
+    <h1 class="text-2xl font-bold text-gray-800 mb-8 flex items-center gap-2">
+        <i class="bi bi-signpost-2-fill text-blue-600"></i>
+        Create Sign
+    </h1>
+
+    <!-- Progress Bar -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center text-sm font-medium text-gray-600 mb-2">
+            <span id="stepLabel">Step 1 of 5: General Information</span>
+            <span id="progressPercent">20%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out" style="width: 20%;"></div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white shadow-md rounded-lg border border-gray-100 p-6">
+        <form method="post" class="space-y-6" id="multiStepForm" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm mb-3"></div>
+
+            <!-- SECTION 1: General Information -->
+            <div class="form-section" id="section-1">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">General Information</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label asp-for="Command.Sign.SignIdNumber" class="block text-sm font-semibold text-gray-700 mb-1">SIGN ID Number</label>
+                        <input asp-for="Command.Sign.SignIdNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" readonly/>
+                        <span asp-validation-for="Command.Sign.SignIdNumber" class="text-red-600 text-xs"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.RouteName" class="block text-sm font-semibold text-gray-700 mb-1">Route Name</label>
+                        <input asp-for="Command.Sign.RouteName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.NodeNumber" class="block text-sm font-semibold text-gray-700 mb-1">Node Number</label>
+                        <input asp-for="Command.Sign.NodeNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.SARTSMCode" class="block text-sm font-semibold text-gray-700 mb-1">SARTSM Code</label>
+                        <input asp-for="Command.Sign.SARTSMCode" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.SignType" class="block text-sm font-semibold text-gray-700 mb-1">Sign Type</label>
+                        <input asp-for="Command.Sign.SignType" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.Action" class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                        <select asp-for="Command.Sign.Action" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="">-- Select Action --</option>
+                            <option>Newly Installed</option>
+                            <option>Existing</option>
+                            <option>Removed</option>
+                            <option>To Be Replaced</option>
+                            <option>Damaged</option>
+                            <option>Missing</option>
+                        </select>
+                        <span asp-validation-for="Command.Sign.Action" class="text-red-600 text-xs"></span>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Dimensions -->
+            <div class="form-section hidden" id="section-2">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Dimensions & Supports</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label asp-for="Command.Sign.WidthMm" class="block text-sm font-semibold text-gray-700 mb-1">Width (mm)</label>
+                        <input asp-for="Command.Sign.WidthMm" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.HeightMm" class="block text-sm font-semibold text-gray-700 mb-1">Height (mm)</label>
+                        <input asp-for="Command.Sign.HeightMm" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.AreaM2" class="block text-sm font-semibold text-gray-700 mb-1">Area m2</label>
+                        <input asp-for="Command.Sign.AreaM2" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.NumPoles" class="block text-sm font-semibold text-gray-700 mb-1">Number of Poles</label>
+                        <input asp-for="Command.Sign.NumPoles" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.PoleDiameter" class="block text-sm font-semibold text-gray-700 mb-1">Pole Diameter (mm)</label>
+                        <input asp-for="Command.Sign.PoleDiameter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.PoleLengthMm" class="block text-sm font-semibold text-gray-700 mb-1">Pole Length (mm)</label>
+                        <input asp-for="Command.Sign.PoleLengthMm" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.ExcavationDepthCubicM" class="block text-sm font-semibold text-gray-700 mb-1">Excavation Depth (m3)</label>
+                        <input asp-for="Command.Sign.ExcavationDepthCubicM" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.SupportType" class="block text-sm font-semibold text-gray-700 mb-1">Support Type</label>
+                        <input asp-for="Command.Sign.SupportType" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Location -->
+            <div class="form-section hidden" id="section-3">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Location</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label asp-for="Command.Sign.Latitude" class="block text-sm font-semibold text-gray-700 mb-1">Latitude</label>
+                        <input asp-for="Command.Sign.Latitude" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.Longitude" class="block text-sm font-semibold text-gray-700 mb-1">Longitude</label>
+                        <input asp-for="Command.Sign.Longitude" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.OffsetDistanceM" class="block text-sm font-semibold text-gray-700 mb-1">Offset Distance (m)</label>
+                        <input asp-for="Command.Sign.OffsetDistanceM" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.InstallationStatus" class="block text-sm font-semibold text-gray-700 mb-1">Installation Status</label>
+                        <input asp-for="Command.Sign.InstallationStatus" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: File Uploads -->
+            <div class="form-section hidden" id="section-4">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">File Uploads</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- PDF Upload -->
+                    <div>
+                        <label asp-for="Command.PdfFile" class="block text-sm font-semibold text-gray-700 mb-2">
+                            PDF Design File (.pdf)
+                        </label>
+                        <input asp-for="Command.PdfFile" type="file" accept=".pdf"
+                               class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Command.PdfFile" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- JPG Upload -->
+                    <div>
+                        <label asp-for="Command.JpgFile" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Sign Image (.jpg, .jpeg)
+                        </label>
+                        <input asp-for="Command.JpgFile" type="file" accept=".jpg,.jpeg,.png"
+                               class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Command.JpgFile" class="text-red-500 text-sm"></span>
+
+                        <!-- Optional Preview -->
+                        <div class="mt-3">
+                            <img id="jpgPreview" class="hidden w-40 h-40 object-cover rounded-lg border" />
+                        </div>
+                    </div>
+
+                    <!-- SGX Upload -->
+                    <div>
+                        <label asp-for="Command.SgxFile" class="block text-sm font-semibold text-gray-700 mb-2">
+                            SGX Design File (.sgx)
+                        </label>
+                        <input asp-for="Command.SgxFile" type="file" accept=".png"
+                               class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Command.SgxFile" class="text-red-500 text-sm"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: Relationships -->
+            <div class="form-section hidden" id="section-5">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Relationships</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label asp-for="Command.Sign.CreatedByUserId" class="block text-sm font-semibold text-gray-700 mb-1">
+                            <i class="fas fa-envelope me-1"></i>Created By 
+                        </label>
+                        <input asp-for="Command.Sign.CreatedByUserId" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-blue-500" value="ndlelamusa1st@gmail.com" readonly />
+                        <span asp-validation-for="Command.Sign.CreatedByUserId" class="text-danger small"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.ProjectId" class="block text-sm font-semibold text-gray-700 mb-1">
+                            <i class="bi bi-folder-plus text-blue-600"></i>Project
+                        </label>
+                        <select asp-for="Command.Sign.ProjectId" asp-items="ViewBag.ProjectId" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-blue-500">
+                            <option value="">-- Select Project --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label asp-for="Command.Sign.ClientId" class="block text-sm font-semibold text-gray-700 mb-1">
+                            <i class="fas fa-envelope me-1"></i>Project Client
+                        </label>
+                        <input asp-for="Command.Sign.ClientId" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-blue-500" value="" readonly />
+                        <span asp-validation-for="Command.Sign.ClientId" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between pt-6 border-t">
+                <button type="button" id="prevBtn"
+                        class="hidden px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                    ← Previous
+                </button>
+
+                <button type="button" id="nextBtn"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    Next →
+                </button>
+
+                <button type="submit" id="submitBtn"
+                        class="hidden px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    <i class="bi bi-check-circle mr-1"></i> Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const sections = document.querySelectorAll(".form-section");
+        const nextBtn = document.getElementById("nextBtn");
+        const prevBtn = document.getElementById("prevBtn");
+        const submitBtn = document.getElementById("submitBtn");
+        const progressBar = document.getElementById("progressBar");
+        const progressPercent = document.getElementById("progressPercent");
+        const stepLabel = document.getElementById("stepLabel");
+        const projClientBtn = document.getElementById("Command_Sign_ProjectId");
+        const projectClient = document.getElementById("Command_Sign_ClientId");
+
+        const routeInput = document.getElementById("Command_Sign_RouteName");
+        const nodeInput = document.getElementById("Command_Sign_NodeNumber");
+        const codeInput = document.getElementById("Command_Sign_SARTSMCode");
+        const idInput = document.getElementById("Command_Sign_SignIdNumber");
+
+        const steps = [
+            "General Information",
+            "Dimensions & Supports",
+            "Location",
+            "File Uploads",
+            "Relationships"
+        ];
+
+        let current = 0;
+
+        function showSection(index) {
+            sections.forEach((s, i) => s.classList.toggle("hidden", i !== index));
+            prevBtn.classList.toggle("hidden", index === 0);
+            nextBtn.classList.toggle("hidden", index === sections.length - 1);
+            submitBtn.classList.toggle("hidden", index !== sections.length - 1);
+
+            // Progress bar update
+            const progress = ((index + 1) / sections.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressPercent.textContent = `${Math.round(progress)}%`;
+            stepLabel.textContent = `Step ${index + 1} of ${sections.length}: ${steps[index]}`;
+        }
+        function updateSignId() {
+            const route = routeInput.value.trim();
+            const node = nodeInput.value.padStart(4, '0');
+            const code = codeInput.value.trim().toUpperCase();
+
+            console.log(route)
+            if (route && node && code) {
+                idInput.value = `${route}-${node}-${code}`;
+                console.log(`${route}-${node}-${code}`)
+            }else{
+                idInput.value = "";
+            }
+        }
+
+        nextBtn.addEventListener("click", () => {
+            if (current < sections.length - 1) current++;
+            showSection(current);
+        });
+
+        prevBtn.addEventListener("click", () => {
+            if (current > 0) current--;
+            showSection(current);
+        });
+
+        showSection(current);
+
+        routeInput.addEventListener("input", updateSignId);
+        nodeInput.addEventListener("input", updateSignId);
+        codeInput.addEventListener("input", updateSignId);
+
+        projClientBtn.addEventListener("change", async (e) =>{
+            const selectedProject = e.target.value;
+            projectClient.value = "";
+            if(selectedProject != ""){
+                try {
+
+                    const response = await fetch(`http://localhost:5040/api/project/${selectedProject}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                    });
+
+                    if (response.ok) {
+                       const project = await response.json();
+                       console.log(project.clients[0].email);
+                       projectClient.value = project.clients[0].email;
+                    } else {
+                        projectClient.value = "";
+
+                    }
+                } catch (err) {
+                        console.error(err);
+                        alert("Failed to connect to the server.");
+                }
+            }
+        });
+
+        const jpgInput = document.querySelector('input[name="JpgFile"]');
+        const jpgPreview = document.getElementById('jpgPreview');
+
+        if (jpgInput) {
+            jpgInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        jpgPreview.src = event.target.result;
+                        jpgPreview.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    jpgPreview.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+}

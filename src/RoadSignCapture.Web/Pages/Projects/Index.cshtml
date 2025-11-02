@@ -63,16 +63,12 @@
                     Overview
                 </button>
                 <button class="py-2 px-3 text-gray-600 hover:text-blue-600 font-medium text-sm transition"
-                        onclick="switchTab('routes')">
-                    Routes
-                </button>
-                <button class="py-2 px-3 text-gray-600 hover:text-blue-600 font-medium text-sm transition"
                         onclick="switchTab('signs')">
                     Signs
                 </button>
                 <button class="py-2 px-3 text-gray-600 hover:text-blue-600 font-medium text-sm transition"
-                        onclick="switchTab('photos')">
-                    Photos
+                        onclick="switchTab('reports')">
+                    Reports
                 </button>
             </div>
 
@@ -85,19 +81,18 @@
                     </p>
                 </div>
 
-                <div id="routesTab" class="hidden">
-                    <h3 class="font-semibold text-gray-700 mb-2">Route Information</h3>
-                    <p class="text-gray-600 text-sm">Display route data, GPS coordinates, and related road info here.</p>
-                </div>
-
                 <div id="signsTab" class="hidden">
                     <h3 class="font-semibold text-gray-700 mb-2">Signs Details</h3>
-                    <p class="text-gray-600 text-sm">Include information such as SARTSM code, sign type, installation status, etc.</p>
+
+                    <div id="signList"
+                        class="space-y-3 max-h-[65vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                        <p class="text-gray-500 text-sm italic">Click "Signs" tab to load project signs...</p>
+                    </div>
                 </div>
 
-                <div id="photosTab" class="hidden">
-                    <h3 class="font-semibold text-gray-700 mb-2">Project Photos</h3>
-                    <p class="text-gray-600 text-sm">Uploaded photos will appear here.</p>
+                <div id="reportsTab" class="hidden">
+                    <h3 class="font-semibold text-gray-700 mb-2">Project Report</h3>
+                    <p class="text-gray-600 text-sm">Export Report about the project</p>
                 </div>
             </div>
         </div>
@@ -105,18 +100,86 @@
 
     <!-- Main Map View -->
     <main class="flex-1 relative">
-        <div class="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-500 text-lg font-semibold">
-            Map View Area (Placeholder)
-        </div>
+        <div id="map" class="absolute inset-0 z-0"></div>
     </main>
+    <!-- Right Side Detail Drawer (Desktop) -->
+    <div id="signDetailDrawer"
+        class="hidden fixed top-0 right-0 w-96 h-full bg-blue-50 border-l border-gray-200 shadow-lg z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="flex items-center justify-between p-4 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i class="bi bi-signpost-2 text-blue-600"></i>
+                <span id="drawerSignId">Sign Details</span>
+            </h3>
+            <button onclick="closeSignDetail()" class="text-gray-500 hover:text-gray-800">
+                <i class="bi bi-x-lg text-lg"></i>
+            </button>
+        </div>
+
+        <div id="drawerSignContent" class="p-4 text-sm text-gray-700 space-y-2">
+            <!-- Details dynamically inserted -->
+        </div>
+    </div>
+
+    <!-- Mobile Modal -->
+    <div id="signDetailModal"
+        class="hidden fixed inset-0 bg-black/50 items-center justify-center z-50 transition-opacity duration-300"
+        onclick="if (event.target.id === 'signDetailModal') closeSignDetail()">
+        <div class="bg-white w-11/12 max-w-md rounded-xl shadow-xl overflow-hidden transform transition-transform duration-300 scale-95">
+            <div class="flex items-center justify-between p-4 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <i class="bi bi-signpost-2 text-blue-600"></i>
+                    <span id="modalSignId">Sign Details</span>
+                </h3>
+                <button onclick="closeSignDetail()" class="text-gray-500 hover:text-gray-800">
+                    <i class="bi bi-x-lg text-lg"></i>
+                </button>
+            </div>
+
+            <div id="modalSignContent" class="p-4 text-sm text-gray-700 space-y-2">
+                <!-- Details dynamically inserted -->
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Scripts -->
 @section Scripts {
     <script>
+        let map;
+        let markersLayer = L.layerGroup(); // Layer to hold all markers
+
+        // Initialize the map
+        function initMap() {
+            // 🇿🇦 Center on South Africa
+            const southAfricaBounds = L.latLngBounds(
+                [-35.0, 16.0],  // Southwest corner (Cape Town region)
+                [-22.0, 33.0]   // Northeast corner (Limpopo region)
+            );
+
+            // Create map centered roughly in South Africa
+            map = L.map('map', {
+                minZoom: 5,
+                maxZoom: 18,
+                zoomControl: true,
+            }).fitBounds(southAfricaBounds);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Marker layer for your signs
+            markersLayer = L.layerGroup().addTo(map);
+        }
+
+
+        // Call this when page loads
+        document.addEventListener("DOMContentLoaded", initMap);
+        const projectNameElement = document.getElementById('detailProjectName');
         function showProjectDetails(name, desc) {
             // Fill details
-            document.getElementById('detailProjectName').innerText = name;
+            projectNameElement.innerText = name;
             document.getElementById('detailProjectDesc').innerText = desc;
 
             // Hide project list, show details
@@ -128,18 +191,239 @@
             // Return to project list
             document.getElementById('projectDetailView').classList.add('hidden');
             document.getElementById('projectListView').classList.remove('hidden');
+            switchTab('overview');
+            closeSignDetail();
         }
 
         function switchTab(tabName) {
-            const tabs = ['overview', 'routes', 'signs', 'photos'];
+            const tabs = ['overview','signs', 'reports'];
             tabs.forEach(tab => {
                 const tabDiv = document.getElementById(tab + 'Tab');
                 if (tab === tabName) {
                     tabDiv.classList.remove('hidden');
+                    if(tabName === 'signs') listSigns( projectNameElement.innerText );
                 } else {
                     tabDiv.classList.add('hidden');
                 }
+                
             });
         }
+
+        function onSignClick(sign) {
+            
+            // Build General Info section
+            const generalInfo = `
+                <div class="space-y-2">
+                    <div><span class="font-medium">Sign ID:</span> ${sign.signIdNumber}</div>
+                    <div><span class="font-medium">Route Name:</span> ${sign.routeName}</div>
+                    <div><span class="font-medium">Node Number:</span> ${sign.nodeNumber}</div>
+                    <div><span class="font-medium">SARTSM Code:</span> ${sign.sartsmCode}</div>
+                    <div><span class="font-medium">Sign Type:</span> ${sign.signType}</div>
+                    <div><span class="font-medium">Installation Status:</span> ${sign.installationStatus}</div>
+                    <div><span class="font-medium">Latitude:</span> ${sign.latitude}</div>
+                    <div><span class="font-medium">Longitude:</span> ${sign.longitude}</div>
+                    <div><span class="font-medium">Number of Poles:</span> ${sign.numPoles}</div>
+                    <div><span class="font-medium">Pole Diameter:</span> ${sign.poleDiameter} mm</div>
+                    <div><span class="font-medium">Pole Length:</span> ${sign.poleLengthMm} mm</div>
+                </div>
+            `;
+
+            // Build Photos section (if any)
+            let photosHTML = "";
+            if (sign.photos && sign.photos.length > 0) {
+                photosHTML = `
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                        ${sign.photos.map(photo => {
+                            const filePath = photo.filePath.replace(/\\\\/g, "/");
+                            const ext = filePath.split('.').pop().toLowerCase();
+
+                            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+                                // Image preview
+                                return `
+                                    <div class="relative group">
+                                        <img src="${filePath}"
+                                            alt="${photo.description}"
+                                            class="w-40 h-24 object-scale-down rounded-md shadow-sm border border-gray-200 hover:opacity-90 transition" width="200" height="200">
+                                        <div class="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] text-center py-0.5 opacity-0 group-hover:opacity-100 transition">${photo.description}</div>
+                                    </div>
+                                `;
+                            } else if (ext === "pdf") {
+                                // PDF open in new tab
+                                return `
+                                    <a href="${filePath}" target="_blank"
+                                        class="flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-md h-24 text-center hover:bg-gray-100 transition shadow-sm">
+                                        <i class="bi bi-file-earmark-pdf text-red-600 text-3xl mb-1"></i>
+                                        <span class="text-xs text-gray-600">${photo.description}</span>
+                                    </a>
+                                `;
+                            } else if (ext === "sgx") {
+                                // SGX download link
+                                return `
+                                    <a href="${filePath}" download
+                                        class="flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-md h-24 text-center hover:bg-gray-100 transition shadow-sm">
+                                        <i class="bi bi-file-earmark text-blue-600 text-3xl mb-1"></i>
+                                        <span class="text-xs text-gray-600">${photo.description}</span>
+                                    </a>
+                                `;
+                            } else {
+                                // Unknown file type
+                                return `
+                                    <div class="flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-md h-24 text-center text-gray-500">
+                                        <i class="bi bi-file-earmark text-gray-400 text-3xl mb-1"></i>
+                                        <span class="text-xs">Unknown File</span>
+                                    </div>
+                                `;
+                            }
+                        }).join('')}
+                    </div>
+                `;
+            } else {
+                photosHTML = `<p class="text-gray-500 text-sm italic mt-2">No photos available for this sign.</p>`;
+            }
+
+
+            // Combined content with collapsible sections
+            const contentHTML = `
+                <div class="space-y-4">
+                    <!-- General Info Toggle -->
+                    <details open class="border border-gray-200 rounded-lg overflow-hidden">
+                        <summary class="cursor-pointer bg-gray-100 px-4 py-2 font-semibold text-gray-800 hover:bg-gray-200">
+                            General Information
+                        </summary>
+                        <div class="p-4 text-sm text-gray-700">
+                            ${generalInfo}
+                        </div>
+                    </details>
+
+                    <!-- Photos Toggle -->
+                    <details class="border border-gray-200 rounded-lg overflow-hidden">
+                        <summary class="cursor-pointer bg-gray-100 px-4 py-2 font-semibold text-gray-800 hover:bg-gray-200">
+                            Photos
+                        </summary>
+                        <div class="p-4 text-sm text-gray-700">
+                            ${photosHTML}
+                        </div>
+                    </details>
+                </div>
+            `;
+
+            if (isMobile()) {
+                // Mobile → open modal
+                const modal = document.getElementById("signDetailModal");
+                document.getElementById("modalSignId").innerText = sign.signIdNumber;
+                document.getElementById("modalSignContent").innerHTML = contentHTML;
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                
+            } else {
+                // Desktop → open drawer
+                document.getElementById("drawerSignId").innerText = sign.signIdNumber;
+                document.getElementById("drawerSignContent").innerHTML = contentHTML;
+                const drawer = document.getElementById("signDetailDrawer");
+                drawer.classList.remove("hidden");
+                // Slide in animation
+                setTimeout(() => drawer.classList.remove("translate-x-full"), 10);
+            }
+        }
+
+        function isMobile() {
+            const width = window.innerWidth;
+            return width < 768;
+        }
+
+        function closeSignDetail() {
+            const drawer = document.getElementById("signDetailDrawer");
+            const modal = document.getElementById("signDetailModal");
+
+            // Close drawer
+            if (!drawer.classList.contains("hidden")) {
+                drawer.classList.add("translate-x-full");
+                setTimeout(() => drawer.classList.add("hidden"), 300);
+            }
+
+            // Close modal
+            if (!modal.classList.contains("hidden")) {
+                modal.classList.add("hidden");
+            }
+            
+        }
+
+
+        async function listSigns(projectName) {
+            const signList = document.getElementById("signList");
+            signList.innerHTML = `<div class="text-gray-500 text-sm italic">Loading signs for <b>${projectName}</b>...</div>`;
+
+            try {
+                const response = await fetch(`http://localhost:5040/api/sign/${projectName}`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    signList.innerHTML = `<p class="text-red-500 text-sm">Error fetching signs: ${errorText}</p>`;
+                    return;
+                }
+
+                const signs = await response.json();
+
+                if (!signs.length) {
+                    signList.innerHTML = `<p class="text-gray-500 italic text-sm">No signs found for project <b>${projectName}</b>.</p>`;
+                    return;
+                }
+
+                // 🗺️ Clear existing map markers
+                markersLayer.clearLayers();
+
+                // Build Sign Cards + Map Markers
+                signList.innerHTML = "";
+                signs.forEach(sign => {
+                    // --- Sign Card ---
+                    const card = document.createElement("div");
+                    card.className = "bg-white rounded-lg border border-gray-200 shadow-sm p-4 hover:shadow-md cursor-pointer mb-2 transition";
+                    card.onclick = () => onSignClick(sign);
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-gray-800">${sign.signIdNumber}</h4>
+                            <span class="text-xs text-gray-500">Node: ${sign.nodeNumber}</span>
+                        </div>
+                        <div class="text-sm text-gray-600 space-y-1">
+                            <p><span class="font-medium">Route:</span> ${sign.routeName}</p>
+                            <p><span class="font-medium">Latitude:</span> ${sign.latitude}</p>
+                            <p><span class="font-medium">Longitude:</span> ${sign.longitude}</p>
+                        </div>
+                    `;
+                    signList.appendChild(card);
+
+                    // --- Map Marker ---
+                    if (sign.latitude && sign.longitude) {
+                        const marker = L.marker([sign.latitude, sign.longitude]).addTo(markersLayer);
+                        marker.bindPopup(`
+                            <b>${sign.signIdNumber}</b><br/>
+                            ${sign.routeName}<br/>
+                            Node: ${sign.nodeNumber}<br/>
+                            <i>${sign.installationStatus}</i>
+                        `);
+
+                        
+                        marker.on('click', () => onSignClick(sign));
+                    }
+                });
+
+                
+                const allLatLng = signs
+                    .filter(s => s.latitude && s.longitude)
+                    .map(s => [s.latitude, s.longitude]);
+                if (allLatLng.length) {
+                    const bounds = L.latLngBounds(allLatLng);
+                    map.fitBounds(bounds, { padding: [30, 30] });
+                }
+
+            } catch (err) {
+                signList.innerHTML = `<p class="text-red-500 text-sm">Failed to connect to the server.</p>`;
+            }
+        }
+
+        
     </script>
 }

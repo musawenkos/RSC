@@ -20,6 +20,12 @@ public partial class RSCDbContext : DbContext
 
     public virtual DbSet<Project> Projects { get; set; }
 
+    public DbSet<Sign> Signs { get; set; }
+
+    public DbSet<Photo> Photos { get; set; }
+
+    public DbSet<AuditTrail> AuditTrails { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Company>(entity =>
@@ -105,6 +111,80 @@ public partial class RSCDbContext : DbContext
             entity.Property(e => e.Created).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.Updated).HasDefaultValueSql("(getutcdate())");
         });
+
+        modelBuilder.Entity<Sign>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.Property(s => s.SignIdNumber)
+                  .IsRequired()
+                  .HasMaxLength(100);
+
+            entity.Property(s => s.SignType).HasMaxLength(100);
+            entity.Property(s => s.RouteName).HasMaxLength(100);
+            entity.Property(s => s.NodeNumber).HasMaxLength(50);
+            entity.Property(s => s.Action).HasMaxLength(50);
+
+            entity.Property(s => s.WidthMm).HasColumnType("float");
+            entity.Property(s => s.HeightMm).HasColumnType("float");
+            entity.Property(s => s.AreaM2).HasColumnType("float");
+            entity.Property(s => s.NumPoles).HasColumnType("int");
+            entity.Property(s => s.PoleDiameter).HasMaxLength(150);
+            entity.Property(s => s.PoleLengthMm).HasColumnType("float");
+            entity.Property(s => s.ExcavationDepthCubicM).HasColumnType("float");
+            entity.Property(s => s.SupportType).HasMaxLength(150);
+
+            entity.Property(s => s.Latitude).HasColumnType("float");
+            entity.Property(s => s.Longitude).HasColumnType("float");
+            entity.Property(s => s.OffsetDistanceM).HasColumnType("float");
+            entity.Property(s => s.InstallationStatus).HasMaxLength(150);
+            entity.HasOne(s => s.CreatedByUser)
+                  .WithMany()
+                  .HasForeignKey(s => s.CreatedByUserId)
+                  .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(s => s.Project)
+                  .WithMany(p => p.Signs)
+                  .HasForeignKey(s => s.ProjectId)
+                  .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(s => s.Client)
+                  .WithMany(u => u.Signs)
+                  .HasForeignKey(s => s.ClientId)
+                  .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        modelBuilder.Entity<Photo>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.FilePath).IsRequired().HasMaxLength(500);
+            entity.Property(p => p.Description).HasMaxLength(255);
+            entity.Property(p => p.Latitude).HasColumnType("float");
+            entity.Property(p => p.Longitude).HasColumnType("float");
+            entity.Property(p => p.CapturedBy).HasMaxLength(150);
+            entity.Property(p => p.CapturedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(p => p.Sign)
+                  .WithMany(s => s.Photos)
+                  .HasForeignKey(p => p.SignId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // --- AuditTrail ---
+        modelBuilder.Entity<AuditTrail>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.ActionType).HasMaxLength(100);
+            entity.Property(a => a.PerformedBy).HasMaxLength(150);
+            entity.Property(a => a.DeviceUsed).HasMaxLength(100);
+            entity.Property(a => a.LocationContext).HasMaxLength(255);
+            entity.Property(a => a.Timestamp).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(a => a.Sign)
+                  .WithMany(s => s.AuditTrails)
+                  .HasForeignKey(a => a.SignId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
 
         var seedDate = new DateTime(2025, 01, 01);
 

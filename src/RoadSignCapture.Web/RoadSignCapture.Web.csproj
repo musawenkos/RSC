@@ -31,4 +31,8 @@
     <ProjectReference Include="..\RoadSignCapture.Infrastructure\RoadSignCapture.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\css\NewFolder\" />
+  </ItemGroup>
+
 </Project>

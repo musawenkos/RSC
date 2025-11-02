@@ -19,8 +19,11 @@ services:
       - MicrosoftGraph__BaseUrl=${MG_BASE_URL}
       - MicrosoftGraph__Scopes=${SCOPES}
       - API_BASE_URL=http://rsc-api:5040
+      - Redis__Host=${REDIS_HOST}
+      - Redis__Port=${REDIS_PORT}
     depends_on:
       - rsc-db
+      - rsc-redis
     networks:
       - rsc-network
 
@@ -35,8 +38,11 @@ services:
     - ASPNETCORE_ENVIRONMENT=Development
     - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
     - ASPNETCORE_URLS=http://+:5040
+    - Redis__Host=${REDIS_HOST}
+    - Redis__Port=${REDIS_PORT}
     depends_on:
     - rsc-db
+    - rsc-redis
     networks:
     - rsc-network
 
@@ -53,9 +59,21 @@ services:
     networks:
       - rsc-network
 
+  rsc-redis:
+    image: redis:7.2
+    container_name: rsc-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - rsc-network
+
 networks:
   rsc-network:
     driver: bridge
 
 volumes:
   sqlserverdata:
+  redis_data:
