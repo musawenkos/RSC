@@ -20,7 +20,7 @@ namespace RoadSignCapture.API.Controllers
         public async Task<IActionResult> GetProjectClientBy(string projectName)
         {
             var project = await _getProjecthandler!.GetProjectBy(projectName, "Client");
-            return project == null ? NotFound() : Ok(project);
+            return project == null ? NotFound(project) : Ok(project);
         }
     }
 }
