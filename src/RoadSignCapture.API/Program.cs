@@ -12,9 +12,27 @@ using RoadSignCapture.Infrastructure.Cache;
 using RoadSignCapture.Infrastructure.Data;
 using RoadSignCapture.Infrastructure.Services;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+//Add Serilog
+builder.Host.UseSerilog((context, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.Elasticsearch(
+        new Serilog.Sinks.Elasticsearch.ElasticsearchSinkOptions(new Uri(context.Configuration["Elasticsearch:Uri"]!))
+        {
+            AutoRegisterTemplate = true,
+            IndexFormat = $"roadsigncapture-api-logs-{DateTime.UtcNow:yyyy.MM.dd}",
+            NumberOfShards = 2,
+            NumberOfReplicas = 1
+        }
+    )
+    .Enrich.WithProperty("Application", "RoadSignCapture.API")
+);
 
 // --- Database ---
 builder.Services.AddDbContext<RSCDbContext>(options =>

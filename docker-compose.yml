@@ -70,10 +70,47 @@ services:
     networks:
       - rsc-network
 
-networks:
-  rsc-network:
-    driver: bridge
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch-wolfi:9.2.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - rsc-network
+
+  kib01:
+    image: docker.elastic.co/kibana/kibana:9.2.0
+    container_name: kib01
+    environment:
+      - ELASTICSEARCH_URL=http://es01:9200
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - es01
+    networks:
+      - rsc-network
 
 volumes:
   sqlserverdata:
   redis_data:
+  esdata01:
+    driver: local
+
+networks:
+  rsc-network:
+    driver: bridge
