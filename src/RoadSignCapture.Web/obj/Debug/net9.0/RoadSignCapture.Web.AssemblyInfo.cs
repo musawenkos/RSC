@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RoadSignCapture.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9b2df15cbc418ec8e56a08a02d470d3138f87237")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0593078e42d0a9d4163afe99736314d6ac45950d")]
 [assembly: System.Reflection.AssemblyProductAttribute("RoadSignCapture.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RoadSignCapture.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

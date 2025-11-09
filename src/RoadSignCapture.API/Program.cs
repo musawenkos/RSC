@@ -13,9 +13,14 @@ using RoadSignCapture.Infrastructure.Data;
 using RoadSignCapture.Infrastructure.Services;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Serilog;
+using FluentValidation;
+using RoadSignCapture.API.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+//Validation
+builder.Services.AddValidatorsFromAssembly(typeof(UserValidator).Assembly, includeInternalTypes: true);
 
 //Add Serilog
 builder.Host.UseSerilog((context, configuration) => configuration
@@ -31,6 +36,7 @@ builder.Host.UseSerilog((context, configuration) => configuration
             NumberOfReplicas = 1
         }
     )
+
     .Enrich.WithProperty("Application", "RoadSignCapture.API")
 );
 
@@ -79,6 +85,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
+builder.Services.AddTransient<RoadSignCapture.API.Middleware.GlobalExceptionHandlingMiddleware>();
 
 var app = builder.Build();
 
@@ -92,6 +99,8 @@ app.UseCors("AllowWebClient");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<RoadSignCapture.API.Middleware.GlobalExceptionHandlingMiddleware>();
 
 app.MapControllers();
 
