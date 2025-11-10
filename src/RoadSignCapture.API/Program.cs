@@ -15,6 +15,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Serilog;
 using FluentValidation;
 using RoadSignCapture.API.Validators;
+using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -23,22 +24,32 @@ var configuration = builder.Configuration;
 builder.Services.AddValidatorsFromAssembly(typeof(UserValidator).Assembly, includeInternalTypes: true);
 
 //Add Serilog
-builder.Host.UseSerilog((context, configuration) => configuration
-    .ReadFrom.Configuration(context.Configuration)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.Elasticsearch(
-        new Serilog.Sinks.Elasticsearch.ElasticsearchSinkOptions(new Uri(context.Configuration["Elasticsearch:Uri"]!))
-        {
-            AutoRegisterTemplate = true,
-            IndexFormat = $"roadsigncapture-api-logs-{DateTime.UtcNow:yyyy.MM.dd}",
-            NumberOfShards = 2,
-            NumberOfReplicas = 1
-        }
-    )
-
-    .Enrich.WithProperty("Application", "RoadSignCapture.API")
-);
+builder.Host.UseSerilog((context, configuration) => 
+{
+    var elasticUri = context.Configuration["Elasticsearch:Uri"];
+    var elasticUsername = context.Configuration["Elasticsearch:Username"];
+    var elasticPassword = context.Configuration["Elasticsearch:Password"];
+    
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.Elasticsearch(
+            new Serilog.Sinks.Elasticsearch.ElasticsearchSinkOptions(new Uri(elasticUri ?? "https://es01:9200"))
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"roadsigncapture-api-logs-{DateTime.UtcNow:yyyy.MM.dd}",
+                NumberOfShards = 2,
+                NumberOfReplicas = 1,
+                ModifyConnectionSettings = conn => conn
+                    .BasicAuthentication(elasticUsername, elasticPassword)
+                    .ServerCertificateValidationCallback((o, certificate, chain, errors) => true),
+                EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog,
+                FailureCallback = e => Console.WriteLine($"[ELASTICSEARCH ERROR] {e.MessageTemplate}")
+            }
+        )
+        .Enrich.WithProperty("Application", "RoadSignCapture.API");
+});
 
 // --- Database ---
 builder.Services.AddDbContext<RSCDbContext>(options =>

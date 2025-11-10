@@ -14,6 +14,10 @@ using System.Security.Claims;
 using RoadSignCapture.Core.Projects.Commands;
 using RoadSignCapture.Core.Signs.Commands;
 using RoadSignCapture.Infrastructure;
+using Serilog;
+using FluentValidation;
+using RoadSignCapture.Web.Validators;
+using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -34,6 +38,39 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
     options.ForwardLimit = null;
 });
+
+//Validation
+builder.Services.AddValidatorsFromAssembly(typeof(RoadSignCapture.Web.Validators.UserValidator).Assembly, includeInternalTypes: true);
+
+
+//Add Serilog
+builder.Host.UseSerilog((context, configuration) => 
+{
+    var elasticUri = context.Configuration["Elasticsearch:Uri"];
+    var elasticUsername = context.Configuration["Elasticsearch:Username"];
+    var elasticPassword = context.Configuration["Elasticsearch:Password"];
+    
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.Elasticsearch(
+            new ElasticsearchSinkOptions(new Uri(elasticUri!))
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"roadsigncapture-web-logs-{DateTime.UtcNow:yyyy.MM.dd}",
+                NumberOfShards = 2,
+                NumberOfReplicas = 1,
+                ModifyConnectionSettings = conn => conn
+                    .BasicAuthentication(elasticUsername, elasticPassword)
+                    .ServerCertificateValidationCallback((o, certificate, chain, errors) => true),
+                EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog,
+                FailureCallback = e => Console.WriteLine($"[ELASTICSEARCH ERROR] {e.MessageTemplate}")
+            }
+        )
+        .Enrich.WithProperty("Application", "RoadSignCapture.Web");
+});
+
 
 builder.Services.AddDbContext<RSCDbContext>(options =>
     options.UseSqlServer(
@@ -169,6 +206,8 @@ builder.Services.AddInfrastructure(configuration);
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+builder.Services.AddTransient<RoadSignCapture.Web.Middleware.GlobalExceptionHandlingMiddleware>();
+
 var app = builder.Build();
 
 // CRITICAL: UseForwardedHeaders MUST be first
@@ -195,16 +234,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-/*app.Use(async (context, next) =>
-{
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("Request: {Method} {Path} {Scheme} {Host}",
-        context.Request.Method,
-        context.Request.Path,
-        context.Request.Scheme,
-        context.Request.Host);
-    await next();
-});*/
+app.UseMiddleware<RoadSignCapture.Web.Middleware.GlobalExceptionHandlingMiddleware>();
 
 app.MapRazorPages();
 app.MapControllers();
@@ -265,7 +295,7 @@ static async Task MigrateDatabaseAsync(WebApplication app)
             logger.LogInformation("Applying migrations...");
             await context.Database.MigrateAsync();
             
-            logger.LogInformation("✅ Database migration completed successfully");
+            logger.LogInformation("Database migration completed successfully");
         }
         else
         {
@@ -278,7 +308,7 @@ static async Task MigrateDatabaseAsync(WebApplication app)
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "❌ An error occurred while migrating the database");
+        logger.LogError(ex, "An error occurred while migrating the database");
         
         // Decide whether to throw or continue
         if (app.Environment.IsProduction())

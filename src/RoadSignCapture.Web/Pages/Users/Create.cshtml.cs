@@ -22,13 +22,15 @@ namespace RoadSignCapture.Web.Pages.Users
         private readonly UserHandler _userHandler;
         private readonly ILogger<CreateModel> _logger;
         private readonly IRoleService _roleService;
+        private readonly FluentValidation.IValidator<CreateUserCommand> _userValidator;
 
-        public CreateModel(RSCDbContext context, UserHandler userHandler, IRoleService roleService, ILogger<CreateModel> logger)
+        public CreateModel(RSCDbContext context, UserHandler userHandler, IRoleService roleService, ILogger<CreateModel> logger, FluentValidation.IValidator<CreateUserCommand> userValidator)
         {
             _context = context;
             _userHandler = userHandler;
             _roleService = roleService;
             _logger = logger;
+            _userValidator = userValidator;
         }
 
 
@@ -46,6 +48,20 @@ namespace RoadSignCapture.Web.Pages.Users
 
         public async Task<IActionResult> OnPostAsync()
         {
+
+            //Validation of Command
+            var validationResult = await _userValidator.ValidateAsync(Command);
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                }
+                // Repopulate RoleList and Company in case of error
+                ViewData["CompanyId"] = new SelectList(_context.Companies, "CompanyId", "CompanyName");
+                RoleList = new SelectList(await _roleService.GetAllAsync(), "RoleId", "RoleName");
+                return Page();
+            }
 
             var result = await _userHandler.CreateHandleAsync(Command);
 
