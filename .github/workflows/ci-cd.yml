@@ -144,6 +144,18 @@ jobs:
             export SCOPES="${{ secrets.SCOPES }}"
             export REDIS_HOST="${{ secrets.REDIS_HOST }}"
             export REDIS_PORT="${{ secrets.REDIS_PORT }}"
+            export ELASTIC_PASSWORD="${{ secrets.ELASTIC_PASSWORD }}"
+            export ENCRYPTION_KEY="${{ secrets.ENCRYPTION_KEY }}"
+            export LICENSE="${{ secrets.LICENSE }}"
+            export KIBANA_PASSWORD="${{ secrets.KIBANA_PASSWORD }}"
+            export ENCRYPTION_KEY="${{ secrets.ENCRYPTION_KEY }}"
+            export STACK_VERSION ="${{ secrets.STACK_VERSION }}"
+            export CLUSTER_NAME ="${{ secrets.CLUSTER_NAME }}"
+            export ES_PORT ="${{ secrets.ES_PORT }}"
+            export ES_MEM_LIMIT ="${{ secrets.ES_MEM_LIMIT }}"
+            export KB_MEM_LIMIT ="${{ secrets.KB_MEM_LIMIT }}"
+            export LS_MEM_LIMIT ="${{ secrets.LS_MEM_LIMIT }}"
+            
 
             echo "🔐 Logging in to GitHub Container Registry..."
             echo "${{ secrets.ORG_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
