@@ -58,6 +58,21 @@ namespace RoadSignCapture.Core.Companies.Commands
             return Result.SuccessResult();
         }
 
+        public async Task<Result> DeleteHandleAsync(int companyId)
+        {
+            if (companyId == 0)
+                return Result.Failure("Company ID is invalid.");
+
+            var existingCompany = await _companyService.GetByIdAsync(companyId);
+            if (existingCompany == null)
+                return Result.Failure("Company not found.");
+
+            _companyService.Remove(existingCompany);
+            await _companyService.SaveChangesAsync();
+
+            return Result.SuccessResult();
+        }
+
         public record Result(bool Success,Company? Company = null, string? Error = null)
         {
             public static Result SuccessResult(Company? c = null)

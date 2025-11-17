@@ -152,8 +152,7 @@
                 }
 
                 try {
-
-                    const response = await fetch("/rscapi/api/company", {
+                    const response = await fetch("http://localhost:5040/api/company", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -163,7 +162,6 @@
 
                     if (response.ok) {
                         const newCompany = await response.json();
-                        //console.log(newCompany)
 
                         // Add to dropdown dynamically
                         $("#Command_Users_CompanyId")
@@ -173,9 +171,43 @@
                         alert("Company added successfully!");
                         $("#addCompanyForm").addClass("hidden");
                         $("#companyName, #fullAddress, #contactNumber").val("");
-                    } else {
-                        const errorText = await response.text();
-                        alert("Error adding company: " + errorText);
+                    } else if (response.status === 400) {
+                        const errorData = await response.json();
+                        if (errorData.errors) {
+                            let errorMessages = [];
+                            for (const field in errorData.errors) {
+                                errorMessages = errorMessages.concat(errorData.errors[field]);
+                            }
+                            alert("Validation Error:\n" + errorMessages.join("\n"));
+                        } else if (errorData.detail) {
+                            alert("Error: " + errorData.detail);
+                        } else {
+                            alert("Error adding company. Please try again.");
+                        }
+                    }else {
+                        // Try to parse the error response
+                        const contentType = response.headers.get("content-type");
+                        
+                        if (contentType && contentType.includes("application/json")) {
+                            const errorData = await response.json();
+                            
+                            // Check if there are validation errors
+                            if (errorData.errors) {
+                                // Collect all error messages
+                                let errorMessages = [];
+                                for (const field in errorData.errors) {
+                                    errorMessages = errorMessages.concat(errorData.errors[field]);
+                                }
+                                alert("Validation Error:\n" + errorMessages.join("\n"));
+                            } else if (errorData.detail) {
+                                alert("Error: " + errorData.detail);
+                            } else {
+                                alert("Error adding company. Please try again.");
+                            }
+                        } else {
+                            const errorText = await response.json();
+                            alert("Error adding company: " + errorText.errors["companyName"][0]);
+                        }
                     }
                 } catch (err) {
                     console.error(err);

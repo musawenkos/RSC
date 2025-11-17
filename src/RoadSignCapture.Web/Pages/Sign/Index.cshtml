@@ -2,180 +2,88 @@
 @model RoadSignCapture.Web.Pages.Sign.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Signs";
 }
 
-<h1>Index</h1>
+<h1 class="text-3xl font-bold text-gray-100 mb-6">Signs</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].SignIdNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].SignType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].SARTSMCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].RouteName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].NodeNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].Action)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].WidthMm)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].HeightMm)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].AreaM2)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].NumPoles)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].PoleDiameter)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].PoleLengthMm)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].ExcavationDepthCubicM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].SupportType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].Latitude)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].Longitude)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].OffsetDistanceM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].InstallationStatus)
-            </th>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].UpdatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].UpdatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].CreatedByUser)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].Project)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sign[0].Client)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Sign) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.SignIdNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SignType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SARTSMCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RouteName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NodeNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Action)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WidthMm)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HeightMm)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AreaM2)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumPoles)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PoleDiameter)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PoleLengthMm)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.ExcavationDepthCubicM)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SupportType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Latitude)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Longitude)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OffsetDistanceM)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.InstallationStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedByUser.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Project.ProjectName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Client.Email)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!-- Grid of Cards -->
+<div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+    @foreach (var item in Model.Sign)
+    {
+        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-lg p-5 hover:shadow-xl transition">
+
+            <!-- Sign Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-green-400">@item.SignIdNumber</h2>
+                <span class="px-2 py-1 text-xs rounded bg-gray-800 border border-gray-600 text-gray-300">
+                    @item.SignType
+                </span>
+            </div>
+
+            <!-- Attributes -->
+            <div class="text-gray-300 space-y-1 text-sm">
+
+                <p>
+                    <span class="font-semibold text-gray-400">SARTSM:</span>
+                    @item.SARTSMCode
+                </p>
+
+                <p>
+                    <span class="font-semibold text-gray-400">Route:</span>
+                    @item.RouteName
+                </p>
+
+                <p>
+                    <span class="font-semibold text-gray-400">Node:</span>
+                    @item.NodeNumber
+                </p>
+
+                <p>
+                    <span class="font-semibold text-gray-400">Status:</span>
+                    <span class="text-blue-300">@item.InstallationStatus</span>
+                </p>
+
+                @if (item.Project != null)
+                {
+                    <p>
+                        <span class="font-semibold text-gray-400">Project:</span>
+                        @item.Project.ProjectName
+                    </p>
+                }
+
+                <p>
+                    <span class="font-semibold text-gray-400">Coordinates:</span>
+                    <span class="text-blue-300">Lat: @item.Latitude, Long: @item.Longitude</span>
+                </p>
+
+            </div>
+
+            <!-- Button Actions -->
+            <div class="mt-8 flex justify-between">
+
+                <!-- Details -->
+                <a asp-page="./Details" asp-route-id="@item.Id"
+                   class="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-gray-900 rounded-lg shadow">
+                    Details
+                </a>
+
+                <!-- Edit -->
+                <a asp-page="./Edit" asp-route-id="@item.Id"
+                   class="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">
+                    Edit
+                </a>
+
+                <!-- Delete -->
+                <a asp-page="./Delete" asp-route-id="@item.Id"
+                   class="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg shadow">
+                    Delete
+                </a>
+
+            </div>
+
+        </div>
+    }
+
+</div>

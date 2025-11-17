@@ -32,7 +32,7 @@
                 <tbody>
                     @foreach (var user in Model.Users)
                     {
-                        <tr class="border-b hover:bg-gray-50 transition">
+                        <tr class="border-b hover:bg-gray-50 transition" >
                             <td class="px-6 py-3 font-medium text-gray-900">@user.DisplayName</td>
                             <td class="px-6 py-3">@user.Email</td>
                             <td class="px-6 py-3">@user.Company.CompanyName</td>
@@ -68,4 +68,3 @@
         <p class="text-gray-500 italic text-center py-8">No users found.</p>
     }
 </div>
-

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RoadSignCapture.Core.Companies.Commands;
+using RoadSignCapture.Core.Companies.Queries;
 using RoadSignCapture.Core.Projects.Queries;
 using RoadSignCapture.Core.Services;
 using RoadSignCapture.Core.Signs.Queries;
@@ -22,6 +23,13 @@ var configuration = builder.Configuration;
 
 //Validation
 builder.Services.AddValidatorsFromAssembly(typeof(UserValidator).Assembly, includeInternalTypes: true);
+
+builder.Services.AddValidatorsFromAssemblies(
+[
+    typeof(UserValidator).Assembly,
+    typeof(CompanyValidator).Assembly,
+
+], includeInternalTypes: true);
 
 //Add Serilog
 builder.Host.UseSerilog((context, configuration) => 
@@ -65,6 +73,7 @@ builder.Services.AddScoped<UserHandler>();
 builder.Services.AddScoped<GetUserHandler>();
 
 builder.Services.AddScoped<CompanyHandler>();
+builder.Services.AddScoped<GetCompaniesHandler>();
 
 
 builder.Services.AddScoped<IProjectService, ProjectService>();

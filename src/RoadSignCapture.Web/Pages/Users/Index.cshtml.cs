@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RoadSignCapture.Web.Pages.Users
 {
-    [Authorize(Policy = "RequireAdmin")]
+    //[Authorize(Policy = "RequireAdmin")]
     public class IndexModel : PageModel
     {
         private readonly IUserService? _userService;
