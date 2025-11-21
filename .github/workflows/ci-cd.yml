@@ -153,5 +153,8 @@ jobs:
             docker compose -f docker-compose.prod.yml pull rsc-web
             docker compose -f docker-compose.prod.yml pull rsc-api
 
+            echo "🛑 Stopping existing containers..."
+            docker compose -f docker-compose.prod.yml down
+
             echo "🚀 Deploying containers..."
             docker compose -f docker-compose.prod.yml up -d --remove-orphans

@@ -1,4 +1,6 @@
 ﻿@page
+@using Microsoft.Extensions.Options
+@inject IOptions<ApiSettings> ApiConfig
 @model RoadSignCapture.Web.Pages.Users.CreateModel
 @{
     ViewData["Title"] = "Create Users";
@@ -127,6 +129,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        const API_BASE = "@ApiConfig.Value.ApiBaseUrl";
         $(function () {
             // Toggle the company form
             $("#btnAddCompany").on("click", function () {
@@ -140,6 +143,7 @@
 
             // Save new company
             $("#btnSaveCompany").on("click", async function () {
+                console.log("API Base URL:", API_BASE);
                 const company = {
                     companyName: $("#companyName").val(),
                     fullAddress: $("#fullAddress").val(),
@@ -152,7 +156,7 @@
                 }
 
                 try {
-                    const response = await fetch("http://localhost:5040/api/company", {
+                    const response = await fetch(`${API_BASE}/api/company`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"

@@ -100,6 +100,10 @@ builder.Services.AddDbContext<RSCDbContext>(options =>
                 errorNumbersToAdd: null)
     ));
 
+builder.Services.Configure<ApiSettings>(configuration);
+
+
+
 // Configure Auth0 Authentication
 builder.Services
     .AddAuth0WebAppAuthentication(options =>
