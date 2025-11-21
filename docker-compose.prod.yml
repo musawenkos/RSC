@@ -1,0 +1,79 @@
+services:
+  rsc-web:
+    image: ghcr.io/musawenkos/rsc-web:latest
+    build:
+      context: .
+      dockerfile: src/RoadSignCapture.Web/Dockerfile
+    ports:
+      - "5050:5050"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5050
+      - AzureAd__ClientId=${AZ_CLIENTID}
+      - AzureAd__ClientSecret=${AZ_CLIENT_SECRET}
+      - AzureAd__Domain=${AZ_DOMAIN}
+      - AzureAd__TenantId=${AZ_TENANTID}
+      - AzureAd__CallbackPath=${AZ_CALLBACK_PATH}
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - AzureAd__Instance=${AZ_INSTANCE}
+      - MicrosoftGraph__BaseUrl=${MG_BASE_URL}
+      - MicrosoftGraph__Scopes=${SCOPES}
+      - API_BASE_URL=http://rsc-api:5040
+      - Redis__Host=${REDIS_HOST}
+      - Redis__Port=${REDIS_PORT}
+    depends_on:
+      - rsc-db
+      - rsc-redis
+    networks:
+      - rsc-network
+
+  rsc-api:
+    image: ghcr.io/musawenkosi/rsc-api:latest
+    build:
+      context: .
+      dockerfile: src/RoadSignCapture.API/Dockerfile
+    ports:
+      - "5040:5040"
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Production
+    - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+    - ASPNETCORE_URLS=http://+:5040
+    - Redis__Host=${REDIS_HOST}
+    - Redis__Port=${REDIS_PORT}
+    depends_on:
+    - rsc-db
+    - rsc-redis
+    networks:
+    - rsc-network
+
+  rsc-db:
+    container_name: rsc-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "${DB_SA_PASSWORD}"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+    networks:
+      - rsc-network
+
+  rsc-redis:
+    image: redis:7.2
+    container_name: rsc-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - rsc-network
+
+volumes:
+  sqlserverdata:
+  redis_data:
+
+networks:
+  rsc-network:
+    driver: bridge

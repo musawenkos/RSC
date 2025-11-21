@@ -44,17 +44,24 @@ builder.Services.AddValidatorsFromAssembly(typeof(RoadSignCapture.Web.Validators
 
 
 //Add Serilog
-builder.Host.UseSerilog((context, configuration) => 
+builder.Host.UseSerilog((context, configuration) =>
 {
-    var elasticUri = context.Configuration["Elasticsearch:Uri"];
-    var elasticUsername = context.Configuration["Elasticsearch:Username"];
-    var elasticPassword = context.Configuration["Elasticsearch:Password"];
-    
+    var env = context.HostingEnvironment;
+
     configuration
         .ReadFrom.Configuration(context.Configuration)
         .Enrich.FromLogContext()
-        .WriteTo.Console()
-        .WriteTo.Elasticsearch(
+        .Enrich.WithProperty("Application", "RoadSignCapture.Web")
+        .WriteTo.Console();
+
+    if (env.IsDevelopment())
+    {
+        // ===== DEVELOPMENT: Log to Elasticsearch =====
+        var elasticUri = context.Configuration["Elasticsearch:Uri"];
+        var elasticUsername = context.Configuration["Elasticsearch:Username"];
+        var elasticPassword = context.Configuration["Elasticsearch:Password"];
+
+        configuration.WriteTo.Elasticsearch(
             new ElasticsearchSinkOptions(new Uri(elasticUri!))
             {
                 AutoRegisterTemplate = true,
@@ -67,9 +74,20 @@ builder.Host.UseSerilog((context, configuration) =>
                 EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog,
                 FailureCallback = e => Console.WriteLine($"[ELASTICSEARCH ERROR] {e.MessageTemplate}")
             }
-        )
-        .Enrich.WithProperty("Application", "RoadSignCapture.Web");
+        );
+    }
+    else
+    {
+        // ===== PRODUCTION: Log to File =====
+        configuration.WriteTo.File(
+            path: "Logs/production-log-.txt",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 30,
+            shared: true
+        );
+    }
 });
+
 
 
 builder.Services.AddDbContext<RSCDbContext>(options =>
