@@ -12,18 +12,20 @@ services:
       - AzureAd__ClientId=${AZ_CLIENTID}
       - AzureAd__ClientSecret=${AZ_CLIENT_SECRET}
       - AzureAd__Domain=${AZ_DOMAIN}
+      - AzureAd__Audience=${AZ_AUDIENCE}
       - AzureAd__TenantId=${AZ_TENANTID}
       - AzureAd__CallbackPath=${AZ_CALLBACK_PATH}
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
       - AzureAd__Instance=${AZ_INSTANCE}
       - MicrosoftGraph__BaseUrl=${MG_BASE_URL}
       - MicrosoftGraph__Scopes=${SCOPES}
-      - API_BASE_URL=http://rsc-api:5040
       - Redis__Host=${REDIS_HOST}
       - Redis__Port=${REDIS_PORT}
       - Elasticsearch__Uri=https://es01:9200
       - Elasticsearch__Username=elastic
       - Elasticsearch__Password=${ELASTIC_PASSWORD}
+      - ApiSettings__InternalAppToken=${INTERNAL_APP_TOKEN}
+      - ApiSettings__BaseUrl=http://rsc-api:5040
     depends_on:
       - rsc-db
       - rsc-redis
@@ -40,12 +42,15 @@ services:
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
     - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+    - AzureAd__Audience=${AZ_AUDIENCE}
+    - AzureAd__Domain=${AZ_DOMAIN}
     - ASPNETCORE_URLS=http://+:5040
     - Redis__Host=${REDIS_HOST}
     - Redis__Port=${REDIS_PORT}
     - Elasticsearch__Uri=https://es01:9200
     - Elasticsearch__Username=elastic
     - Elasticsearch__Password=${ELASTIC_PASSWORD}
+    - ApiSettings__InternalAppToken=${INTERNAL_APP_TOKEN}
     depends_on:
     - rsc-db
     - rsc-redis

@@ -17,6 +17,9 @@ using Serilog;
 using FluentValidation;
 using RoadSignCapture.API.Validators;
 using Serilog.Sinks.Elasticsearch;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
+
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -62,6 +65,39 @@ builder.Host.UseSerilog((context, configuration) =>
 // --- Database ---
 builder.Services.AddDbContext<RSCDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "ApiKey";
+    options.DefaultChallengeScheme = "ApiKey";
+})
+    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey", options => { });
+
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ExternalOnly", policy => policy.RequireAuthenticatedUser());
+
+    options.AddPolicy("RequireUser", policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireRole("Viewer", "Client", "Designer", "SysAdmin"));
+
+    options.AddPolicy("RequireAdmin", policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireRole("SysAdmin"));
+
+    options.AddPolicy("RequireDesigner", policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireRole("Designer", "SysAdmin"));
+
+    options.AddPolicy("RequireClient", policy =>
+        policy.RequireAuthenticatedUser()
+            .RequireRole("Client", "SysAdmin"));
+});
+
+
 
 // --- Services ---
 builder.Services.AddScoped<ICompanyService, CompanyService>();
@@ -117,6 +153,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowWebClient");
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

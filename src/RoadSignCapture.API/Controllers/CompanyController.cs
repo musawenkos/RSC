@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RoadSignCapture.Core.Companies.Commands;
 using RoadSignCapture.Core.Companies.Queries;
@@ -21,6 +22,7 @@ namespace RoadSignCapture.API.Controllers
         }
 
         // POST: api/company
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateCompany([FromBody] CompanyCommands command)
         {

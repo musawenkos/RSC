@@ -18,6 +18,7 @@ using Serilog;
 using FluentValidation;
 using RoadSignCapture.Web.Validators;
 using Serilog.Sinks.Elasticsearch;
+using RoadSignCapture.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -102,7 +103,20 @@ builder.Services.AddDbContext<RSCDbContext>(options =>
 
 builder.Services.Configure<ApiSettings>(configuration);
 
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient<IApiClientService, ApiClientService>(client =>
+{
+    var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"];
+    if (!string.IsNullOrEmpty(apiBaseUrl))
+    {
+        client.BaseAddress = new Uri(apiBaseUrl);
+    }
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    // For development only - ignore SSL certificate errors
+    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+});
 
 // Configure Auth0 Authentication
 builder.Services
@@ -152,8 +166,6 @@ builder.Services
             OnRedirectToIdentityProvider = context =>
             {
                 var request = context.HttpContext.Request;
-                var pathBase = context.HttpContext.Request.PathBase.Value ?? string.Empty;
-
                 var redirectUri = $"{request.Scheme}://{request.Host}/callback";
                 context.ProtocolMessage.RedirectUri = redirectUri;
 
@@ -232,12 +244,12 @@ builder.Services.AddTransient<RoadSignCapture.Web.Middleware.GlobalExceptionHand
 
 var app = builder.Build();
 
-// CRITICAL: UseForwardedHeaders MUST be first
+
 app.UseForwardedHeaders();
 
 await MigrateDatabaseAsync(app);
 
-// CRITICAL: Set the path base for apps hosted in subdirectories
+
 
 //app.UsePathBase("/RoadSignCapture/");
 if (!app.Environment.IsDevelopment())

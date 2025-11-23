@@ -156,16 +156,19 @@
                 }
 
                 try {
-                    const response = await fetch(`${API_BASE}/api/company`, {
+                    const response = await fetch(`/api/proxy/create-company`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]')?.value
                         },
                         body: JSON.stringify(company)
                     });
 
                     if (response.ok) {
                         const newCompany = await response.json();
+
+                        console.log("New Company Created:", newCompany);
 
                         // Add to dropdown dynamically
                         $("#Command_Users_CompanyId")
