@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RoadSignCapture.Core.Users.Queries;
 
@@ -18,6 +19,7 @@ namespace RoadSignCapture.API.Controllers
         }
 
         // GET: api/users/{email}
+        [Authorize]
         [HttpGet("{email}")]
         public async Task<IActionResult> GetDetailsByEmail(string email)
         {

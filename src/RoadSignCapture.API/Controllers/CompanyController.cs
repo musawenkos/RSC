@@ -50,7 +50,9 @@ namespace RoadSignCapture.API.Controllers
             return result.Success ? Ok(result) : BadRequest(result.Error);
         }
 
+        
         //POST: api/company/delete/{companyId}
+        [Authorize]
         [HttpPost("delete/{companyId}")]
         public async Task<IActionResult> DeleteCompany(int companyId)
         {
@@ -60,6 +62,7 @@ namespace RoadSignCapture.API.Controllers
         
 
         //GET api/company/{companyName}
+        [Authorize]
         [HttpGet("{companyName}")]
         public async Task<IActionResult> GetCompanyByName(string companyName)
         {
@@ -68,6 +71,7 @@ namespace RoadSignCapture.API.Controllers
         }
 
         //GET api/company/ 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllCompanies()
         {

@@ -44,5 +44,31 @@ namespace RoadSignCapture.Web.Controller
                 return StatusCode(500, new { error = "Internal server error" });
             }
         }
+
+
+        [HttpGet("list-projects-sign/{projectName}")]
+        public async Task<IActionResult> ListProjectsSignAsync(string projectName)
+        {
+            try
+            {
+                var decodedProjectName = Uri.UnescapeDataString(projectName);
+                var response = await _apiClientService.GetAsync($"api/sign/{projectName}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseData = await response.Content.ReadAsStringAsync();
+                    return Ok(System.Text.Json.JsonSerializer.Deserialize<object>(responseData));
+                }
+                else
+                {
+                    _logger.LogWarning("API request failed with status code: {StatusCode}", response.StatusCode);
+                    return StatusCode((int)response.StatusCode, new { error = "API request failed" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while processing the request.");
+                return StatusCode(500, new { error = "Internal server error" });
+            }
+        }
     }
 }

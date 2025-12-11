@@ -354,7 +354,7 @@
             signList.innerHTML = `<div class="text-gray-500 text-sm italic">Loading signs for <b>${projectName}</b>...</div>`;
 
             try {
-                const response = await fetch(`http://localhost:5040/api/sign/${projectName}`, {
+                const response = await fetch(`/api/proxy/list-projects-sign/${projectName}`, {
                     method: "GET",
                     headers: { "Content-Type": "application/json" }
                 });

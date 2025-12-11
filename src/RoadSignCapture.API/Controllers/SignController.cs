@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RoadSignCapture.Core.Models;
 using RoadSignCapture.Core.Services;
@@ -23,6 +24,7 @@ namespace RoadSignCapture.API.Controllers
         }
 
         //api/sign/{projecName}
+        [Authorize]
         [HttpGet("{projectName}")]
 
         public async Task<IActionResult> GetSignsProjectBy(string projectName)
